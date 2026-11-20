@@ -1,0 +1,1780 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ponskaarten">
+<meta name="theme-color" content="#15307c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Ponskaarten Nederlands</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, -apple-system, sans-serif; -webkit-text-size-adjust: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<script>window.PONS_STANDALONE = true;</script>
+</head>
+<body>
+<style>
+/* Layout: one punched card as the working surface, control panel beside it, stacked on narrow screens.
+   Palette: Delft cobalt on porcelain, with Dutch orange reserved for the primary action. */
+:root {
+  --bg: #e6ecf5;
+  --card: #fcfdff;
+  --ink: #15307c;
+  --muted: #566690;
+  --line: #bfcce3;
+  --tint: #d8e2f2;
+  --accent: #c44a05;
+  --on-accent: #ffffff;
+  --good: #17754d;
+  --bad: #b3261e;
+  --shadow: rgba(21, 48, 124, .16);
+  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1430; --card: #18244e; --ink: #dfe8fb; --muted: #9dadd3; --line: #33447a;
+    --tint: #24336a; --accent: #ff8f45; --on-accent: #1a1006; --good: #5ad1a0; --bad: #ff8f86;
+    --shadow: rgba(0, 0, 0, .45); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1430; --card: #18244e; --ink: #dfe8fb; --muted: #9dadd3; --line: #33447a;
+  --tint: #24336a; --accent: #ff8f45; --on-accent: #1a1006; --good: #5ad1a0; --bad: #ff8f86;
+  --shadow: rgba(0, 0, 0, .45); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.5 var(--body); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.page {
+  max-width: 1040px; margin: 0 auto;
+  padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 20px;
+}
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; }
+.brand { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; min-width: 0; }
+h1 { font: 800 1.75rem/1.1 var(--display); margin: 0; letter-spacing: -.01em; }
+.brand span { font: 400 .78rem var(--mono); color: var(--muted); }
+nav { display: flex; flex-wrap: wrap; gap: 2px; }
+.welcome { margin: 0; padding: 10px 12px; background: var(--tint); font-size: .92rem; }
+.chip { min-height: 44px; padding: 8px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; font: 500 .98rem var(--mono); }
+.chip:hover:not(:disabled) { background: var(--tint); }
+.chip:disabled { opacity: .3; cursor: default; }
+.chip.placed { background: var(--tint); border-color: var(--tint); }
+.chip.placed:disabled { opacity: 1; }
+.built { display: flex; flex-wrap: wrap; gap: 6px; min-height: 58px; padding: 6px 0; border-bottom: 1px solid var(--line); align-items: center; }
+.built span { font-size: .85rem; color: var(--muted); }
+.bank { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 6px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.hard-wrap { display: flex; margin-top: 10px; }
+.route { display: flex; flex-direction: column; }
+.stage { display: grid; grid-template-columns: 34px minmax(0, 1fr) 124px; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.stage .num { font: 800 1.5rem/1 var(--display); align-self: start; }
+.stage .info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.stage h3 { margin: 0; font: 800 1.1rem/1.2 var(--display); }
+.stage small { color: var(--muted); font-size: .8rem; }
+.stage .bar { flex: none; max-width: 300px; margin-top: 4px; }
+.stage .btn { min-height: 44px; padding: 8px 6px; }
+@media (max-width: 520px) { .stage { grid-template-columns: 34px minmax(0, 1fr); } .stage .btn { grid-column: 2; } }
+.dialog { display: flex; flex-direction: column; }
+.line { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 8px 0; border-bottom: 1px solid var(--tint); }
+.who { font: 500 .8rem/1.6 var(--mono); color: var(--muted); }
+.said { display: flex; flex-direction: column; min-width: 0; }
+.ref .said p { margin: 0; }
+.nl-line { font-weight: 600; }
+.pt-line { font-size: .9rem; color: var(--muted); }
+.hide-pt .pt-line { display: none; }
+.dialog-seg { max-width: 300px; }
+.ref.study { max-width: 880px; gap: 20px; }
+.lesson-nav { display: flex; flex-wrap: wrap; gap: 6px; }
+.lchip { display: flex; gap: 6px; align-items: baseline; min-height: 38px; padding: 6px 11px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; font-size: .88rem; }
+.lchip b { font: 800 .95rem var(--display); }
+.lchip:hover { background: var(--tint); }
+.lchip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.study-bar { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; font-size: .85rem; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+.cover-seg { flex: 0 1 320px; }
+.lesson { display: flex; flex-direction: column; gap: 30px; }
+.lhead { display: flex; flex-direction: column; gap: 4px; }
+.lhead small { font: 400 .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ref .lhead h2 { font-size: clamp(1.7rem, 5vw, 2.3rem); line-height: 1.08; }
+.lhead p { color: var(--muted); }
+.ref h3 { font: 800 1.15rem/1.2 var(--display); margin: 0; }
+.dsec { display: flex; flex-direction: column; gap: 8px; }
+.dsec > p { font-size: .92rem; color: var(--muted); }
+.nl-c { font-family: var(--mono); font-weight: 500; cursor: pointer; }
+.nl-c:hover { text-decoration: underline dotted; }
+.covered .nl-c:not(.show) { color: transparent; background: var(--tint); border-radius: 2px; user-select: none; text-decoration: none; }
+.numgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0 20px; }
+.numgrid div { display: flex; gap: 12px; align-items: baseline; padding: 4px 0; border-bottom: 1px solid var(--tint); min-width: 0; }
+.numgrid b { flex: none; width: 2.8em; text-align: right; font: 500 .85rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.numgrid span { min-width: 0; overflow-wrap: anywhere; }
+.lfoot { display: flex; flex-wrap: wrap; gap: 8px; }
+.lfoot .btn { flex: 1 1 170px; }
+nav button {
+  background: none; border: 0; border-bottom: 2px solid transparent;
+  padding: 6px 10px; font-weight: 500; color: var(--muted);
+}
+nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+@media (max-width: 420px) { nav button { padding: 6px 6px; font-size: .92rem; } }
+/* Phone: app-style tab bar fixed to the bottom, clear of the iPhone home indicator */
+@media (max-width: 640px) {
+  nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0;
+    background: var(--card); border-top: 1px solid var(--line);
+    padding: 2px max(4px, env(safe-area-inset-right, 0px)) calc(2px + env(safe-area-inset-bottom, 0px)) max(4px, env(safe-area-inset-left, 0px));
+  }
+  nav button { min-height: 50px; padding: 8px 1px; font-size: .74rem; border-bottom: 0; border-top: 2px solid transparent; }
+  nav button[aria-selected="true"] { border-top-color: var(--accent); }
+  .page { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+  .card { min-height: 250px; }
+}
+.file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.foot label.linkish { cursor: pointer; }
+.listen-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.train { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: start; }
+@media (max-width: 800px) { .train { grid-template-columns: minmax(0, 1fr); } }
+.work { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.progress { display: flex; align-items: center; gap: 12px; font: 400 .78rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar { flex: 1; height: 4px; background: var(--tint); }
+.bar i { display: block; height: 100%; background: var(--ink); transition: width .2s; }
+
+/* The card: a 1px outer shape provides the border, because clip-path removes real borders on the cut corner */
+.card-wrap { filter: drop-shadow(0 6px 14px var(--shadow)); }
+.card-edge { padding: 1px; background: var(--line); clip-path: polygon(27px 0, 100% 0, 100% 100%, 0 100%, 0 27px); }
+.card {
+  background: var(--card); min-height: 380px;
+  clip-path: polygon(26px 0, 100% 0, 100% 100%, 0 100%, 0 26px);
+  padding: 18px 20px 14px; display: flex; flex-direction: column; gap: 14px;
+}
+.card-top { display: flex; justify-content: space-between; gap: 12px; padding-left: 18px; font: 400 .72rem var(--mono); color: var(--muted); }
+.card-top b { font-weight: 500; }
+
+.hole {
+  display: block; width: 11px; height: 18px; border: 1px solid var(--line); border-radius: 2px; background: transparent;
+}
+.hole.on { background: var(--ink); border-color: var(--ink); }
+
+.persons { display: flex; gap: 14px; justify-content: space-between; }
+.pgroup { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pgroup:first-child { flex: 6; }
+.pgroup:last-child { flex: 3.4; }
+.pgroup > small { font: 400 .62rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+.pcols { display: flex; justify-content: space-between; gap: 2px; }
+.pcol { display: flex; flex-direction: column; align-items: center; gap: 3px; font: 400 .66rem var(--mono); color: var(--muted); }
+.pcol.on { color: var(--ink); font-weight: 500; }
+
+.face { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 6px 0; min-width: 0; }
+.q { display: flex; flex-direction: column; gap: 4px; }
+.q-main { font: 800 clamp(2.1rem, 6.5vw, 3.1rem)/1.08 var(--display); margin: 0; overflow-wrap: anywhere; text-wrap: balance; }
+.q-main.long { font-size: clamp(1.45rem, 4.5vw, 2rem); line-height: 1.18; }
+.q-main u { text-decoration: none; display: inline-block; min-width: 2.4em; border-bottom: .07em solid currentColor; }
+.q-sub { color: var(--muted); }
+.q-sub b { color: var(--ink); font-weight: 600; }
+
+.a { display: flex; flex-direction: column; gap: 10px; border-top: 1px dashed var(--line); padding-top: 12px; animation: drop .18s ease-out; }
+@keyframes drop { from { transform: translateY(-5px); opacity: .3; } }
+.a-main { font: 800 clamp(1.8rem, 5.5vw, 2.6rem)/1.1 var(--display); color: var(--accent); margin: 0; overflow-wrap: anywhere; }
+.a-main.long { font-size: clamp(1.3rem, 4vw, 1.75rem); line-height: 1.2; }
+.note { font-size: .92rem; color: var(--muted); max-width: 60ch; margin: 0; }
+.verdict { font-weight: 600; margin: 0; }
+.verdict.ok { color: var(--good); }
+.verdict.no { color: var(--bad); }
+.forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2px 18px; margin: 0; }
+.forms div { display: flex; justify-content: space-between; gap: 10px; font: 400 .85rem var(--mono); padding: 2px 4px; }
+.forms dt { color: var(--muted); }
+.forms dd { margin: 0; font-weight: 500; }
+.forms .hit { background: var(--tint); }
+
+.card-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.levels { display: flex; align-items: center; gap: 4px; font: 400 .66rem var(--mono); color: var(--muted); }
+.levels span:first-child { margin-right: 4px; }
+.levels .hole { width: 9px; height: 14px; }
+.speak { background: none; border: 1px solid var(--line); border-radius: 2px; padding: 3px 10px; font: 500 .75rem var(--mono); }
+.speak:hover { background: var(--tint); }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { flex: 1 1 130px; min-height: 48px; padding: 10px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; font-weight: 600; }
+.btn:hover { background: var(--tint); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.08); background: var(--accent); }
+.btn.good { color: var(--good); border-color: var(--good); }
+.btn.bad { color: var(--bad); border-color: var(--bad); }
+.btn kbd { font: 400 .7rem var(--mono); opacity: .7; margin-left: 6px; }
+@media (hover: none) { .btn kbd { display: none; } }
+
+.write { display: flex; gap: 8px; flex-wrap: wrap; }
+.write input { flex: 3 1 180px; min-width: 0; min-height: 48px; padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; font: 500 1.05rem var(--mono); }
+.write .btn { flex: 1 1 110px; }
+.linkish { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; font-size: .85rem; align-self: flex-start; }
+
+.end { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+.end h2 { font: 800 2rem/1.1 var(--display); margin: 0; }
+.end p { margin: 0; color: var(--muted); max-width: 52ch; }
+.end .actions { margin-top: 6px; }
+
+.side { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.side h2 { font: 500 .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+.seg button { flex: 1; background: none; border: 0; padding: 7px 6px; font-size: .88rem; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 600; }
+.opts { display: flex; flex-direction: column; gap: 8px; }
+
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.kpis div { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.kpis b { font: 800 1.4rem/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.kpis span { font-size: .74rem; color: var(--muted); line-height: 1.25; }
+
+.boxes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; align-items: end; height: 96px; margin-top: 14px; }
+.boxc { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 3px; height: 100%; min-width: 0; font: 400 .68rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.boxc i { display: block; width: 100%; background: var(--ink); min-height: 1px; }
+.boxc.new i { background: var(--line); }
+.boxc b { color: var(--ink); font-weight: 500; }
+.boxnote { font-size: .78rem; color: var(--muted); margin: 8px 0 0; }
+
+.decks { display: flex; flex-direction: column; gap: 12px; }
+.dgroup { display: flex; flex-direction: column; }
+.dgroup > small { font-size: .78rem; font-weight: 600; margin-bottom: 2px; }
+.deckrow { display: flex; align-items: stretch; border-bottom: 1px solid var(--tint); }
+.only { flex: none; background: none; border: 0; padding: 0 2px 0 10px; font: 400 .72rem var(--mono); color: var(--muted); text-decoration: underline; }
+.only:hover { color: var(--accent); }
+.deck { display: flex; align-items: center; gap: 9px; background: none; border: 0; padding: 6px 2px; text-align: left; flex: 1; min-width: 0; }
+.deck:hover { background: var(--tint); }
+.deck .hole { flex: none; }
+.deck span.n { flex: 1; min-width: 0; font-size: .92rem; }
+.deck span.c { font: 400 .7rem var(--mono); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.foot { display: flex; flex-direction: column; gap: 6px; font-size: .78rem; color: var(--muted); }
+.foot .row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+
+/* Reference views */
+.ref { display: flex; flex-direction: column; gap: 30px; max-width: 780px; }
+.ref section { display: flex; flex-direction: column; gap: 10px; }
+.ref h2 { font: 800 1.45rem/1.15 var(--display); margin: 0; text-wrap: balance; }
+.ref p { margin: 0; max-width: 66ch; }
+.ref ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; max-width: 66ch; }
+.nl { font-family: var(--mono); font-weight: 500; font-size: .94em; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th { text-align: left; font: 500 .7rem var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--line); padding: 6px 12px 6px 0; white-space: nowrap; }
+td { border-bottom: 1px solid var(--tint); padding: 7px 12px 7px 0; vertical-align: top; }
+td.m { font-family: var(--mono); font-weight: 500; white-space: nowrap; }
+.callout { background: var(--tint); padding: 12px 14px; max-width: 66ch; }
+.filter { width: 100%; max-width: 340px; min-height: 44px; padding: 8px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 3px; }
+@media (prefers-reduced-motion: reduce) { .a { animation: none; } .bar i { transition: none; } }
+</style>
+
+<div class="page">
+  <header>
+    <div class="brand">
+      <h1>Ponskaarten</h1>
+      <span>ponskaart (de) = cartão perfurado</span>
+    </div>
+    <nav role="tablist" aria-label="Secções">
+      <button id="tab-train" role="tab" data-tab="train" aria-selected="true">Treinar</button>
+      <button id="tab-study" role="tab" data-tab="study" aria-selected="false">Estudar</button>
+      <button id="tab-route" role="tab" data-tab="route" aria-selected="false">Percurso</button>
+      <button id="tab-dialogs" role="tab" data-tab="dialogs" aria-selected="false">Diálogos</button>
+      <button id="tab-verbs" role="tab" data-tab="verbs" aria-selected="false">Verbos</button>
+      <button id="tab-rules" role="tab" data-tab="rules" aria-selected="false">Regras</button>
+    </nav>
+  </header>
+
+  <main id="view-train" class="train">
+    <div class="work">
+      <p class="welcome" id="welcome">Primeira vez aqui? Responde com honestidade: quem acerta volta mais tarde, quem falha volta já. Não sabes por onde começar? <button class="linkish" id="welcome-route" type="button">Vê o percurso sugerido</button></p>
+      <div class="progress"><span id="prog-text"></span><div class="bar"><i id="prog-bar" style="width:0"></i></div><span id="prog-fpy"></span></div>
+      <div class="card-wrap"><div class="card-edge"><article class="card" id="card"></article></div></div>
+      <div id="actions" class="actions"></div>
+    </div>
+    <aside class="side">
+      <div class="opts">
+        <div class="seg" role="group" aria-label="Modo">
+          <button id="mode-flip" data-mode="flip">Virar cartão</button>
+          <button id="mode-write" data-mode="write">Escrever</button>
+          <button id="mode-listen" data-mode="listen">Ditado</button>
+        </div>
+        <div class="seg" id="front-seg" role="group" aria-label="Frente do vocabulário">
+          <button id="front-pt" data-front="pt">Frente em PT</button>
+          <button id="front-nl" data-front="nl">Frente em NL</button>
+        </div>
+      </div>
+      <div>
+        <h2>Progresso</h2>
+        <div class="kpis" id="kpis"></div>
+        <div class="boxes" id="boxes"></div>
+        <p class="boxnote">Quem acerta sobe de caixa e volta mais tarde: 1, 3, 7 e 21 dias. Quem falha volta à caixa 1.</p>
+        <div id="hard-wrap" class="hard-wrap"></div>
+      </div>
+      <div>
+        <h2>Baralhos</h2>
+        <div class="decks" id="decks"></div>
+      </div>
+      <div class="foot">
+        <span id="sync">Progresso guardado neste aparelho. Guarda uma cópia de vez em quando.</span>
+        <div class="row" id="reset-row"></div>
+      </div>
+    </aside>
+  </main>
+
+  <main id="view-study" class="ref study" hidden>
+    <div class="lesson-nav" id="lesson-nav" role="group" aria-label="Lições"></div>
+    <div class="study-bar">
+      <span>Toca numa palavra holandesa para a ouvires.</span>
+      <div class="seg cover-seg" role="group" aria-label="Modo de estudo">
+        <button id="cover-off" data-cover="off" type="button" aria-pressed="true">Ver tudo</button>
+        <button id="cover-on" data-cover="on" type="button" aria-pressed="false">Tapar holandês</button>
+      </div>
+    </div>
+    <div class="lesson" id="lesson"></div>
+  </main>
+
+  <main id="view-route" class="ref" hidden>
+    <section>
+      <h2>Percurso sugerido</h2>
+      <p>Nove etapas por ordem. Treinar uma etapa liga só os baralhos dela. Passa à seguinte quando a maior parte dos cartões estiver consolidada.</p>
+      <div class="route" id="route"></div>
+    </section>
+  </main>
+
+  <main id="view-dialogs" class="ref" hidden>
+    <section>
+      <h2>Diálogos curtos</h2>
+      <p>Lê em voz alta. Quando já conheceres o diálogo, esconde o português e confirma se ainda percebes tudo.</p>
+      <div class="seg dialog-seg" role="group" aria-label="Tradução">
+        <button id="pt-show" data-pt="show" type="button" aria-pressed="true">Com tradução</button>
+        <button id="pt-hide" data-pt="hide" type="button" aria-pressed="false">Só holandês</button>
+      </div>
+    </section>
+    <div class="ref" id="dialogs"></div>
+  </main>
+
+  <main id="view-verbs" class="ref" hidden>
+    <section>
+      <h2>Todos os verbos do baralho</h2>
+      <p>O plural é sempre igual ao infinitivo, por isso tem uma coluna só. Procura em holandês ou em português.</p>
+      <input id="verb-filter" class="filter" type="search" placeholder="Ex.: werken, comer" aria-label="Procurar verbo">
+      <div class="scroll"><table>
+        <thead><tr><th>Verbo</th><th>Significado</th><th>ik</th><th>jij</th><th>u</th><th>hij / zij / het</th><th>wij / jullie / zij</th></tr></thead>
+        <tbody id="verb-rows"></tbody>
+      </table></div>
+    </section>
+  </main>
+
+  <main id="view-rules" class="ref" hidden>
+    <section>
+      <h2>A fórmula do presente</h2>
+      <p>Só existem três formas para quase todos os verbos. Parte do radical, que é a forma do <span class="nl">ik</span>.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Pronome</th><th>Forma</th><th>werken</th></tr></thead>
+        <tbody>
+          <tr><td class="m">ik</td><td>radical</td><td class="m">ik werk</td></tr>
+          <tr><td class="m">jij, u, hij, zij, het</td><td>radical + t</td><td class="m">jij werkt</td></tr>
+          <tr><td class="m">wij, jullie, zij</td><td>infinitivo</td><td class="m">wij werken</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2>Como encontrar o radical</h2>
+      <p>Tira o <span class="nl">-en</span> ao infinitivo e ajusta a escrita para manter o mesmo som.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Caso</th><th>Infinitivo</th><th>ik</th><th>jij / hij</th><th>Porquê</th></tr></thead>
+        <tbody>
+          <tr><td>Vogal longa ganha outra vogal</td><td class="m">maken</td><td class="m">maak</td><td class="m">maakt</td><td><span class="nl">mak</span> soaria com a curto.</td></tr>
+          <tr><td>Consoante dupla simplifica</td><td class="m">liggen</td><td class="m">lig</td><td class="m">ligt</td><td>O holandês não termina palavras com consoante dupla.</td></tr>
+          <tr><td><span class="nl">v</span> passa a <span class="nl">f</span></td><td class="m">geven</td><td class="m">geef</td><td class="m">geeft</td><td>Nunca há <span class="nl">v</span> em final de sílaba.</td></tr>
+          <tr><td><span class="nl">z</span> passa a <span class="nl">s</span></td><td class="m">lezen</td><td class="m">lees</td><td class="m">leest</td><td>Nunca há <span class="nl">z</span> em final de sílaba.</td></tr>
+          <tr><td>Radical termina em <span class="nl">t</span></td><td class="m">zitten</td><td class="m">zit</td><td class="m">zit</td><td>Não se junta um segundo <span class="nl">t</span>.</td></tr>
+          <tr><td>Radical termina em <span class="nl">d</span></td><td class="m">worden</td><td class="m">word</td><td class="m">wordt</td><td>O <span class="nl">t</span> junta-se na mesma. Na fala soa igual.</td></tr>
+          <tr><td>Monossílabos</td><td class="m">gaan</td><td class="m">ga</td><td class="m">gaat</td><td>Tira-se só o <span class="nl">-n</span> (e a vogal repetida).</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2>A armadilha do jij</h2>
+      <p>Quando <span class="nl">jij</span> ou <span class="nl">je</span> vem <strong>depois</strong> do verbo, o <span class="nl">-t</span> desaparece. Só acontece com estes dois pronomes.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Normal</th><th>Verbo antes do sujeito</th><th>Perde o -t?</th></tr></thead>
+        <tbody>
+          <tr><td class="m">Jij werkt morgen.</td><td class="m">Werk jij morgen?</td><td>Sim</td></tr>
+          <tr><td class="m">U werkt morgen.</td><td class="m">Werkt u morgen?</td><td>Não</td></tr>
+          <tr><td class="m">Hij werkt morgen.</td><td class="m">Werkt hij morgen?</td><td>Não</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2>Irregulares que tens de decorar</h2>
+      <ul>
+        <li><span class="nl">zijn</span>: ik ben, jij bent, hij is, wij zijn.</li>
+        <li><span class="nl">hebben</span>: ik heb, jij hebt, hij heeft, wij hebben. Com u, <span class="nl">u hebt</span> e <span class="nl">u heeft</span> estão ambos certos.</li>
+        <li>Modais: <span class="nl">hij kan, hij wil, hij zal, hij mag</span> não levam <span class="nl">-t</span> na 3.ª pessoa.</li>
+        <li>Com jij há duas formas: <span class="nl">jij kunt/kan, jij wilt/wil, jij zult/zal</span>. Na pergunta diz-se <span class="nl">kun je?, wil je?, zul je?</span></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Qual pronome usar</h2>
+      <ul>
+        <li><span class="nl">jij, wij, zij</span> dão ênfase. <span class="nl">je, we, ze</span> são as formas normais da conversa.</li>
+        <li><span class="nl">u</span> é formal e conjuga-se como <span class="nl">jij</span>. Nos Países Baixos o tratamento por <span class="nl">jij</span> é muito comum no trabalho; segue o que os colegas usam.</li>
+        <li><span class="nl">zij</span> tanto é "ela" como "eles". O verbo desfaz a dúvida: <span class="nl">zij werkt</span> (ela), <span class="nl">zij werken</span> (eles).</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Ordem das palavras</h2>
+      <ul>
+        <li>O verbo conjugado fica na <strong>2.ª posição</strong>. Se a frase começa por outra coisa, o sujeito passa para depois do verbo: <span class="nl">Morgen werk ik thuis.</span></li>
+        <li>Com modal, o segundo verbo vai para o fim e fica no infinitivo: <span class="nl">Ik wil koffie drinken.</span></li>
+        <li><span class="nl">niet</span> nega verbos e adjetivos: <span class="nl">Ik werk niet.</span> <span class="nl">geen</span> nega substantivos sem artigo definido: <span class="nl">Ik heb geen auto.</span></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Falar do passado</h2>
+      <p>Na conversa usa-se quase sempre o <em>perfectum</em>: <span class="nl">hebben</span> ou <span class="nl">zijn</span> no presente e o particípio no fim da frase. <span class="nl">Ik heb gisteren gewerkt.</span></p>
+      <ul>
+        <li>Particípio regular: <span class="nl">ge</span> + radical + <span class="nl">t</span> ou <span class="nl">d</span>.</li>
+        <li>Leva <span class="nl">t</span> se o radical terminar em t, k, f, s, ch ou p. A mnemónica é <span class="nl">'t kofschip</span>: <span class="nl">gewerkt, gefietst</span>.</li>
+        <li>Nos outros casos leva <span class="nl">d</span>: <span class="nl">gewoond, geleerd</span>. Vê-se a letra do infinitivo: <span class="nl">reizen</span> dá <span class="nl">gereisd</span>.</li>
+        <li>Muitos verbos comuns são irregulares e têm de ser decorados: <span class="nl">eten, gegeten; zien, gezien</span>.</li>
+        <li>Prefixos <span class="nl">be-, ge-, her-, ont-, ver-</span> não levam <span class="nl">ge-</span>: <span class="nl">betalen, betaald</span>.</li>
+        <li><span class="nl">zijn</span> serve para <span class="nl">zijn, blijven, worden</span>, mudanças de estado e movimento com destino: <span class="nl">Ik ben naar huis gegaan.</span> O resto usa <span class="nl">hebben</span>.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Números ao contrário</h2>
+      <ul>
+        <li>De 21 a 99 diz-se primeiro a unidade: <span class="nl">vijfenzestig</span> é "cinco e sessenta", ou seja, 65.</li>
+        <li>Tudo numa só palavra. Depois de <span class="nl">twee</span> e <span class="nl">drie</span> o "en" leva trema: <span class="nl">tweeëntwintig, drieëndertig</span>.</li>
+        <li>De 1100 a 1999 conta-se em centenas: 1250 é <span class="nl">twaalfhonderdvijftig</span>.</li>
+        <li>Anos até 1999 partem-se em dois: 1987 é <span class="nl">negentien zevenentachtig</span>.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Ver as horas</h2>
+      <p>O erro clássico de quem fala português: <span class="nl">half drie</span> são <strong>2:30</strong>, não 3:30. O holandês conta a meia hora em direção à hora seguinte.</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Hora</th><th>Em holandês</th><th>Lógica</th></tr></thead>
+        <tbody>
+          <tr><td class="m">2:00</td><td class="m">twee uur</td><td>Só a hora certa leva <span class="nl">uur</span></td></tr>
+          <tr><td class="m">2:10</td><td class="m">tien over twee</td><td>10 depois das 2</td></tr>
+          <tr><td class="m">2:15</td><td class="m">kwart over twee</td><td>Um quarto depois das 2</td></tr>
+          <tr><td class="m">2:20</td><td class="m">tien voor half drie</td><td>10 antes da meia hora que leva às 3</td></tr>
+          <tr><td class="m">2:25</td><td class="m">vijf voor half drie</td><td>5 antes dessa meia hora</td></tr>
+          <tr><td class="m">2:30</td><td class="m">half drie</td><td>Meia hora antes das 3</td></tr>
+          <tr><td class="m">2:35</td><td class="m">vijf over half drie</td><td>5 depois dessa meia hora</td></tr>
+          <tr><td class="m">2:40</td><td class="m">tien over half drie</td><td>10 depois dessa meia hora</td></tr>
+          <tr><td class="m">2:45</td><td class="m">kwart voor drie</td><td>Um quarto antes das 3</td></tr>
+          <tr><td class="m">2:50</td><td class="m">tien voor drie</td><td>10 antes das 3</td></tr>
+        </tbody>
+      </table></div>
+      <p>Na conversa usa-se o relógio de 12 horas. Em horários e transportes ouves o de 24: <span class="nl">veertien uur dertig</span>.</p>
+    </section>
+
+    <section>
+      <h2>Plural</h2>
+      <ul>
+        <li>Regra geral: <span class="nl">-en</span>. <span class="nl">boek, boeken</span>.</li>
+        <li>Termina em <span class="nl">-el, -er, -en, -je</span>: <span class="nl">-s</span>. <span class="nl">tafel, tafels</span>.</li>
+        <li>Termina em vogal <span class="nl">a, o, u, i, y</span>: <span class="nl">'s</span>. <span class="nl">auto, auto's</span>.</li>
+        <li>A escrita segue as regras dos verbos, ao contrário: <span class="nl">man, mannen</span>; <span class="nl">jaar, jaren</span>; <span class="nl">huis, huizen</span>.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>de ou het</h2>
+      <ul>
+        <li>Cerca de dois terços das palavras usam <span class="nl">de</span>, mas o melhor é decorar cada substantivo com o artigo.</li>
+        <li>Diminutivos em <span class="nl">-je</span> usam sempre <span class="nl">het</span>: <span class="nl">het meisje</span>.</li>
+        <li>O plural usa sempre <span class="nl">de</span>: <span class="nl">het huis, de huizen</span>.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Pronúncia para quem fala português</h2>
+      <div class="scroll"><table>
+        <thead><tr><th>Escrita</th><th>Soa como</th><th>Exemplo</th></tr></thead>
+        <tbody>
+          <tr><td class="m">g, ch</td><td>Perto do "rr" gutural de "carro". Em Brabant ouves a <em>zachte g</em>, bem mais suave do que no norte.</td><td class="m">goed, acht</td></tr>
+          <tr><td class="m">sch</td><td>"s" seguido desse som gutural</td><td class="m">schrijven</td></tr>
+          <tr><td class="m">ij, ei</td><td>Quase o "ei" de "leite" dito à lisboeta</td><td class="m">wij, klein</td></tr>
+          <tr><td class="m">ui</td><td>Não existe em português. Começa num "e" fechado de lábios arredondados e fecha em "ü".</td><td class="m">huis</td></tr>
+          <tr><td class="m">oe</td><td>"u" de "tu"</td><td class="m">boek</td></tr>
+          <tr><td class="m">ie</td><td>"i" de "vi"</td><td class="m">zien</td></tr>
+          <tr><td class="m">uu</td><td>"u" francês de "lune"</td><td class="m">muur</td></tr>
+          <tr><td class="m">eu</td><td>"eu" francês de "peu"</td><td class="m">neus</td></tr>
+          <tr><td class="m">aa, ee, oo</td><td>Vogais longas. O <span class="nl">ee</span> tende para "ei" e o <span class="nl">oo</span> para "ou".</td><td class="m">maan, twee, boom</td></tr>
+          <tr><td class="m">j</td><td>"i" de "iate"</td><td class="m">ja</td></tr>
+          <tr><td class="m">w</td><td>"v" muito leve, quase só com os lábios</td><td class="m">werken</td></tr>
+          <tr><td class="m">-en final</td><td>Na fala o <span class="nl">n</span> quase cai</td><td class="m">werken ≈ "verke"</td></tr>
+          <tr><td class="m">-d, -b finais</td><td>Soam a <span class="nl">t</span> e <span class="nl">p</span></td><td class="m">word ≈ "wort"</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ---------- Content ---------- */
+const PERSONS = {
+  ik: { nl: 'ik', pt: 'eu', g: 's' }, jij: { nl: 'jij', pt: 'tu', g: 's' }, u: { nl: 'u', pt: 'você, formal', g: 's' },
+  hij: { nl: 'hij', pt: 'ele', g: 's' }, zijs: { nl: 'zij', pt: 'ela', g: 's' }, het: { nl: 'het', pt: 'neutro', g: 's' },
+  wij: { nl: 'wij', pt: 'nós', g: 'p' }, jullie: { nl: 'jullie', pt: 'vocês', g: 'p' }, zijp: { nl: 'zij', pt: 'eles / elas', g: 'p' }
+};
+// A "|" separates accepted alternatives; the first one is the main form.
+const V = (inf, pt, ik, jij, hij, extra = {}) => ({ inf, pt, ik, jij, hij, ...extra });
+const reg = (inf, pt, ik, extra) => V(inf, pt, ik, ik + 't', ik + 't', extra);
+const same = (inf, pt, ik, extra) => V(inf, pt, ik, ik, ik, extra);
+
+// Generated cards: the card is one pattern, and each showing draws fresh numbers.
+const UNITS = ['', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht', 'negen'];
+const TENS = { 20: 'twintig', 30: 'dertig', 40: 'veertig', 50: 'vijftig', 60: 'zestig', 70: 'zeventig', 80: 'tachtig', 90: 'negentig' };
+const HOURS = ['', 'een', 'twee', 'drie', 'vier', 'vijf', 'zes', 'zeven', 'acht', 'negen', 'tien', 'elf', 'twaalf'];
+const randInt = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+function twoDigitWord(n) {
+  const unit = UNITS[n % 10], tens = TENS[n - n % 10];
+  if (!unit) return tens;
+  return unit + (unit.endsWith('e') ? 'ën' : 'en') + tens; // ë marks that "e" and "en" are separate syllables
+}
+const TENS_CARDS = Object.keys(TENS).map(Number).map(t => ({ key: String(t), make: () => {
+  const n = t + randInt(1, 9), u = n % 10;
+  return { q: String(n), sub: 'Como se diz em holandês?', a: [twoDigitWord(n)], note: `Lê-se ao contrário: ${u} e ${t}.` };
+} }));
+const PRICE_CARDS = [0, 25, 50, 75, 95, 99].map(c => ({ key: String(c), make: () => {
+  const e = randInt(1, 12), cc = String(c).padStart(2, '0');
+  const answer = c ? `${HOURS[e]} euro ${twoDigitWord(c)}` : `${HOURS[e]} euro`;
+  return { q: `€ ${e},${cc}`, sub: 'Como se diz o preço?', a: [answer], note: 'euro fica sempre no singular.' };
+} }));
+const ROUND_UP = 'Conta para a hora seguinte.';
+const CLOCK_PATTERNS = [
+  ['00', (h) => [`${h} uur`], 'Em hora certa diz-se uur.'],
+  ['05', (h) => [`vijf over ${h}`], 'over = depois de.'],
+  ['10', (h) => [`tien over ${h}`], 'over = depois de.'],
+  ['15', (h) => [`kwart over ${h}`], ''],
+  ['20', (h, n) => [`tien voor half ${n}`, `twintig over ${h}`], `10 minutos antes da meia hora. ${ROUND_UP}`],
+  ['25', (h, n) => [`vijf voor half ${n}`], `5 minutos antes da meia hora. ${ROUND_UP}`],
+  ['30', (h, n) => [`half ${n}`], 'Atenção: half é meia hora ANTES da hora que dizes.'],
+  ['35', (h, n) => [`vijf over half ${n}`], `5 minutos depois da meia hora. ${ROUND_UP}`],
+  ['40', (h, n) => [`tien over half ${n}`, `twintig voor ${n}`], `10 minutos depois da meia hora. ${ROUND_UP}`],
+  ['45', (h, n) => [`kwart voor ${n}`], ROUND_UP],
+  ['50', (h, n) => [`tien voor ${n}`], 'voor = antes de.'],
+  ['55', (h, n) => [`vijf voor ${n}`], 'voor = antes de.']
+];
+const CLOCK_CARDS = CLOCK_PATTERNS.map(([mm, build, note]) => ({ key: mm, make: () => {
+  const h = randInt(1, 12), n = h % 12 + 1;
+  return { q: `${h}:${mm}`, sub: 'Hoe laat is het?', a: build(HOURS[h], HOURS[n]), note };
+} }));
+
+const DECKS = [
+  { id: 'pron', group: 'Conjugar', name: 'Pronomes pessoais', type: 'vocab', items: [
+    ['eu', 'ik'], ['tu', 'jij|je', 'je é a forma normal na conversa.'], ['você, o senhor (formal)', 'u'],
+    ['ele', 'hij'], ['ela', 'zij|ze'], ['isto, coisa neutra', 'het'], ['nós', 'wij|we'],
+    ['vocês', 'jullie'], ['eles, elas', 'zij|ze'] ] },
+  { id: 'ess', group: 'Conjugar', name: 'Verbos essenciais', type: 'conj', perPerson: true, verbs: [
+    V('zijn', 'ser, estar', 'ben', 'bent', 'is', { note: 'Totalmente irregular. Decora-o primeiro.' }),
+    V('hebben', 'ter', 'heb', 'hebt', 'heeft', { u: 'hebt|heeft', note: 'Com u, hebt e heeft estão ambos certos.' }),
+    reg('gaan', 'ir', 'ga', { note: 'Monossílabo: ga, gaat, gaan.' }),
+    reg('doen', 'fazer', 'doe', { note: 'Monossílabo: doe, doet, doen.' }),
+    reg('komen', 'vir', 'kom', { note: 'Exceção à vogal longa: escreve-se kom, com um só o.' }),
+    reg('zien', 'ver', 'zie', { note: 'Monossílabo: zie, ziet, zien.' }),
+    reg('staan', 'estar de pé', 'sta', { note: 'Monossílabo: sta, staat, staan.' }),
+    same('weten', 'saber', 'weet', { note: 'O radical termina em t, por isso não muda.' })
+  ] },
+  { id: 'mod', group: 'Conjugar', name: 'Verbos modais', type: 'conj', perPerson: true, verbs: [
+    V('kunnen', 'poder, conseguir', 'kan', 'kunt|kan', 'kan', { note: 'Em perguntas diz-se kun je?' }),
+    V('willen', 'querer', 'wil', 'wilt|wil', 'wil', { note: 'hij wil, sem t.' }),
+    same('moeten', 'ter de, dever', 'moet', { note: 'Radical termina em t.' }),
+    same('mogen', 'poder, ter permissão', 'mag', { note: 'Uma só forma no singular: mag.' }),
+    V('zullen', 'ir (futuro), dever', 'zal', 'zult|zal', 'zal', { note: 'Em perguntas diz-se zul je?' })
+  ] },
+  { id: 'reg', group: 'Conjugar', name: 'Regulares simples', type: 'conj', note: 'Regular: radical, radical + t, infinitivo.', verbs: [
+    reg('werken', 'trabalhar', 'werk'), reg('drinken', 'beber', 'drink'), reg('kijken', 'olhar, ver', 'kijk'),
+    reg('zoeken', 'procurar', 'zoek'), reg('helpen', 'ajudar', 'help'), reg('denken', 'pensar', 'denk'),
+    reg('brengen', 'trazer, levar', 'breng'), reg('krijgen', 'receber', 'krijg'), reg('fietsen', 'andar de bicicleta', 'fiets'),
+    reg('luisteren', 'escutar', 'luister'), reg('wandelen', 'passear a pé', 'wandel')
+  ] },
+  { id: 'lon', group: 'Conjugar', name: 'Vogal longa', type: 'conj', note: 'A vogal duplica para manter o som longo.', verbs: [
+    reg('maken', 'fazer, construir', 'maak'), reg('wonen', 'morar', 'woon'), reg('leren', 'aprender', 'leer'),
+    reg('kopen', 'comprar', 'koop'), reg('lopen', 'andar a pé', 'loop'), reg('slapen', 'dormir', 'slaap'),
+    reg('nemen', 'tirar, levar', 'neem'), reg('spreken', 'falar', 'spreek'), reg('koken', 'cozinhar', 'kook'),
+    reg('vragen', 'perguntar', 'vraag'), reg('betalen', 'pagar', 'betaal'), reg('horen', 'ouvir', 'hoor')
+  ] },
+  { id: 'dbl', group: 'Conjugar', name: 'Consoante dupla', type: 'conj', note: 'A consoante dupla simplifica no radical.', verbs: [
+    reg('liggen', 'estar deitado', 'lig'), reg('zeggen', 'dizer', 'zeg'), reg('bellen', 'telefonar', 'bel'),
+    reg('pakken', 'agarrar', 'pak'), reg('stoppen', 'parar', 'stop'), reg('beginnen', 'começar', 'begin'),
+    reg('bestellen', 'encomendar, pedir', 'bestel'), reg('kennen', 'conhecer', 'ken')
+  ] },
+  { id: 'vz', group: 'Conjugar', name: 'v vira f, z vira s', type: 'conj', note: 'v e z nunca ficam no fim da sílaba.', verbs: [
+    reg('geven', 'dar', 'geef'), reg('schrijven', 'escrever', 'schrijf'), reg('blijven', 'ficar', 'blijf'),
+    reg('lezen', 'ler', 'lees'), reg('reizen', 'viajar', 'reis'), reg('kiezen', 'escolher', 'kies')
+  ] },
+  { id: 'td', group: 'Conjugar', name: 'Radical em t ou d', type: 'conj', verbs: [
+    same('wachten', 'esperar', 'wacht', { note: 'Termina em t: não se junta outro t.' }),
+    same('zitten', 'estar sentado', 'zit', { note: 'Termina em t: não se junta outro t.' }),
+    same('zetten', 'pôr, colocar', 'zet', { note: 'Termina em t: não se junta outro t.' }),
+    same('eten', 'comer', 'eet', { note: 'Termina em t: não se junta outro t.' }),
+    same('heten', 'chamar-se', 'heet', { note: 'Termina em t: não se junta outro t.' }),
+    reg('worden', 'tornar-se', 'word', { note: 'Termina em d: o t junta-se na mesma.' }),
+    reg('vinden', 'encontrar, achar', 'vind', { note: 'Termina em d: o t junta-se na mesma.' }),
+    reg('rijden', 'conduzir', 'rijd', { note: 'Termina em d: o t junta-se na mesma.' }),
+    V('houden', 'segurar; houden van: gostar de', 'houd|hou', 'houdt', 'houdt', { note: 'ik houd e ik hou estão ambos certos.' })
+  ] },
+  { id: 'inv', group: 'Conjugar', name: 'Verbo antes do sujeito', type: 'cloze', items: [
+    ['___ jij Nederlands?', 'spreken', 'Falas holandês?', 'Spreek', 'jij depois do verbo: perde o t.'],
+    ['___ je in Amsterdam?', 'wonen', 'Moras em Amesterdão?', 'Woon', 'je depois do verbo: perde o t.'],
+    ['Waar ___ jij?', 'werken', 'Onde trabalhas?', 'werk', 'jij depois do verbo: perde o t.'],
+    ['Wat ___ je morgen?', 'doen', 'O que fazes amanhã?', 'doe', 'je depois do verbo: perde o t.'],
+    ['___ jij morgen?', 'komen', 'Vens amanhã?', 'Kom', 'jij depois do verbo: perde o t.'],
+    ['___ jij een auto?', 'hebben', 'Tens carro?', 'Heb', 'heb jij, sem t.'],
+    ['___ jij thuis?', 'zijn', 'Estás em casa?', 'Ben', 'ben jij, sem t.'],
+    ['___ je koffie?', 'willen', 'Queres café?', 'Wil', 'wil je, sem t.'],
+    ['Wat ___ je?', 'eten', 'O que comes?', 'eet', 'O radical já termina em t.'],
+    ['Hoe ___ jij?', 'heten', 'Como te chamas?', 'heet', 'O radical já termina em t.'],
+    ['___ je dat?', 'weten', 'Sabes isso?', 'Weet', 'O radical já termina em t.'],
+    ['___ u Nederlands?', 'spreken', 'Fala holandês? (formal)', 'Spreekt', 'Com u o t mantém-se.'],
+    ['___ u moe?', 'zijn', 'Está cansado? (formal)', 'Bent', 'Com u mantém-se bent.'],
+    ['Waar ___ hij?', 'wonen', 'Onde mora ele?', 'woont', 'Com hij o t mantém-se.'],
+    ['___ hij thuis?', 'zijn', 'Ele está em casa?', 'Is', 'hij is.'],
+    ['Morgen ___ ik thuis.', 'werken', 'Amanhã trabalho em casa.', 'werk', 'Verbo na 2.ª posição; ik fica depois.'],
+    ['Vandaag ___ we naar Utrecht.', 'gaan', 'Hoje vamos a Utrecht.', 'gaan', 'Plural: igual ao infinitivo.'],
+    ['Wanneer ___ jullie?', 'komen', 'Quando vêm vocês?', 'komen', 'Plural: igual ao infinitivo.']
+  ] },
+  { id: 'order', group: 'Conjugar', name: 'Construir frases', type: 'build', items: [
+    ['Trabalho em Utrecht.', 'Ik werk in Utrecht.', '', 'Frase simples: sujeito e verbo.'],
+    ['Moras aqui?', 'Woon je hier?', '', 'Pergunta: o verbo vem primeiro e je tira o t.'],
+    ['Falas holandês?', 'Spreek jij Nederlands?', '', 'Pergunta: o verbo vem primeiro e jij tira o t.'],
+    ['Onde trabalhas?', 'Waar werk je?', '', 'Palavra interrogativa e logo a seguir o verbo.'],
+    ['O que fazes amanhã?', 'Wat doe je morgen?', '', 'Palavra interrogativa e logo a seguir o verbo.'],
+    ['Quando vem ele?', 'Wanneer komt hij?', '', 'Com hij o t mantém-se.'],
+    ['Amanhã trabalho em casa.', 'Morgen werk ik thuis.', 'Morgen', 'O verbo fica na 2.ª posição, por isso ik passa para depois dele.'],
+    ['Hoje vamos a Utrecht.', 'Vandaag gaan we naar Utrecht.', 'Vandaag', 'O verbo fica na 2.ª posição.'],
+    ['Agora bebo café.', 'Nu drink ik koffie.', 'Nu', 'O verbo fica na 2.ª posição.'],
+    ['Quero beber café.', 'Ik wil koffie drinken.', '', 'O segundo verbo vai para o fim.'],
+    ['Posso ajudar?', 'Kan ik helpen?', '', 'O segundo verbo vai para o fim.'],
+    ['Podes ajudar-me?', 'Kun je me helpen?', '', 'kun je, sem t, e helpen no fim.'],
+    ['Tenho de trabalhar amanhã.', 'Ik moet morgen werken.|Morgen moet ik werken.', '', 'O segundo verbo vai para o fim.'],
+    ['Ele não pode vir.', 'Hij kan niet komen.', '', 'niet fica antes do verbo no fim.'],
+    ['Não quero trabalhar hoje.', 'Ik wil vandaag niet werken.|Vandaag wil ik niet werken.', '', 'niet fica antes do verbo no fim.'],
+    ['Não trabalho hoje.', 'Ik werk vandaag niet.|Vandaag werk ik niet.', '', 'Sem segundo verbo, niet fica no fim.'],
+    ['Ela não mora aqui.', 'Zij woont hier niet.', '', 'Sem segundo verbo, niet fica no fim.'],
+    ['Não tenho tempo.', 'Ik heb geen tijd.', '', 'geen fica antes do substantivo.'],
+    ['Vou trabalhar amanhã.', 'Ik ga morgen werken.|Morgen ga ik werken.', '', 'gaan + infinitivo no fim serve para o futuro.'],
+    ['Amanhã vou comprar pão.', 'Morgen ga ik brood kopen.', 'Morgen', 'gaan na 2.ª posição, kopen no fim.'],
+    ['Ontem trabalhei em casa.', 'Gisteren heb ik thuis gewerkt.', 'Gisteren', 'heb na 2.ª posição, particípio no fim.']
+  ] },
+  { id: 'past', group: 'Conjugar', name: 'Passado: os mais usados', type: 'vocab', items: [
+    ['trabalhei', 'ik heb gewerkt'], ['morei', 'ik heb gewoond'], ['aprendi', 'ik heb geleerd'], ['fiz, construí', 'ik heb gemaakt'], ['fiz (uma ação)', 'ik heb gedaan', 'Irregular.'],
+    ['disse', 'ik heb gezegd'], ['comprei', 'ik heb gekocht', 'Irregular.'], ['comi', 'ik heb gegeten', 'Irregular.'], ['bebi', 'ik heb gedronken', 'Irregular.'], ['dormi', 'ik heb geslapen', 'Irregular.'],
+    ['li', 'ik heb gelezen', 'Irregular.'], ['escrevi', 'ik heb geschreven', 'Irregular.'], ['falei', 'ik heb gesproken', 'Irregular.'], ['vi', 'ik heb gezien', 'Irregular.'], ['tive', 'ik heb gehad', 'Irregular.'],
+    ['ajudei', 'ik heb geholpen', 'Irregular.'], ['pensei', 'ik heb gedacht', 'Irregular.'], ['tirei, levei', 'ik heb genomen', 'Irregular.'], ['dei', 'ik heb gegeven', 'Irregular.'], ['encontrei, achei', 'ik heb gevonden', 'Irregular.'], ['olhei', 'ik heb gekeken', 'Irregular.'],
+    ['paguei', 'ik heb betaald', 'Sem ge-: começa por be-.'], ['percebi', 'ik heb begrepen', 'Sem ge- extra: começa por be-.'],
+    ['estive, fui (ser)', 'ik ben geweest', 'Usa zijn.'], ['fui (a um sítio)', 'ik ben gegaan', 'Movimento com destino: usa zijn.'], ['vim', 'ik ben gekomen', 'Usa zijn.'], ['fiquei', 'ik ben gebleven', 'Usa zijn.'], ['comecei', 'ik ben begonnen', 'Usa zijn e não leva ge-.']
+  ] },
+  { id: 'hello', group: 'Básicos', name: 'Frases do dia a dia', type: 'vocab', items: [
+    ['olá', 'hallo|hoi', 'hoi é mais informal.'], ['bom dia', 'goedemorgen'], ['boa tarde', 'goedemiddag'], ['boa noite (ao chegar)', 'goedenavond'],
+    ['adeus', 'tot ziens|doei', 'doei é informal.'], ['até amanhã', 'tot morgen'], ['obrigado (informal)', 'dank je wel'], ['obrigado (formal)', 'dank u wel'],
+    ['por favor, aqui tens (informal)', 'alsjeblieft'], ['por favor, aqui tem (formal)', 'alstublieft'], ['de nada', 'graag gedaan'],
+    ['desculpa', 'sorry'], ['com licença', 'pardon'], ['sim', 'ja'], ['não', 'nee'],
+    ['Como estás?', 'Hoe gaat het?'], ['Bem, e tu?', 'Goed, en met jou?'], ['Como te chamas?', 'Hoe heet je?'], ['Chamo-me... (o teu nome)', 'Ik heet ...'],
+    ['De onde és?', 'Waar kom je vandaan?'], ['Sou de... (país)', 'Ik kom uit ...'], ['Moro em... (cidade)', 'Ik woon in ...'],
+    ['Falo um pouco de holandês.', 'Ik spreek een beetje Nederlands.'], ['Não percebo.', 'Ik begrijp het niet.'], ['Falas inglês?', 'Spreek je Engels?'],
+    ['Podes repetir?', 'Kun je dat herhalen?'], ['Pode falar mais devagar?', 'Kunt u wat langzamer praten?'], ['O que significa isso?', 'Wat betekent dat?'],
+    ['Como se diz isso em holandês?', 'Hoe zeg je dat in het Nederlands?'], ['Queria um café, por favor.', 'Ik wil graag een koffie.'],
+    ['A conta, por favor.', 'Mag ik de rekening?'], ['Onde é a casa de banho?', 'Waar is het toilet?'], ['Bom apetite!', 'Eet smakelijk!'],
+    ['Bom dia! (ao despedir)', 'Fijne dag!'], ['Bom fim de semana!', 'Prettig weekend!']
+  ] },
+  { id: 'ask', group: 'Básicos', name: 'Perguntas', type: 'vocab', items: [
+    ['quem', 'wie'], ['o quê', 'wat'], ['onde', 'waar'], ['quando', 'wanneer'], ['porquê', 'waarom'], ['como', 'hoe'],
+    ['quanto, quantos', 'hoeveel'], ['qual', 'welke|welk', 'welk só com palavras het no singular.']
+  ] },
+  { id: 'small', group: 'Básicos', name: 'Palavras pequenas', type: 'vocab', items: [
+    ['não (com verbos)', 'niet'], ['nenhum (com substantivos)', 'geen'], ['e', 'en'], ['ou', 'of'], ['mas', 'maar'], ['porque', 'want'],
+    ['também', 'ook'], ['agora', 'nu'], ['aqui', 'hier'], ['ali', 'daar'], ['muito (quantidade)', 'veel'], ['muito (intensidade)', 'heel|erg'],
+    ['um pouco', 'een beetje'], ['bom, bem', 'goed'], ['em casa', 'thuis']
+  ] },
+  { id: 'poss', group: 'Básicos', name: 'Possessivos', type: 'vocab', items: [
+    ['meu, minha', 'mijn'], ['teu, tua', 'jouw|je'], ['seu, sua (formal)', 'uw'], ['dele', 'zijn'], ['dela', 'haar'],
+    ['nosso (palavra de)', 'onze', 'onze auto (de auto).'], ['nosso (palavra het)', 'ons', 'ons huis (het huis).'], ['de vocês', 'jullie'], ['deles, delas', 'hun']
+  ] },
+  { id: 'num', group: 'Números e tempo', name: 'Números de 0 a 1000', type: 'vocab', items: [
+    ['0', 'nul'], ['1', 'een|één'], ['2', 'twee'], ['3', 'drie'], ['4', 'vier'], ['5', 'vijf'], ['6', 'zes'], ['7', 'zeven'], ['8', 'acht'], ['9', 'negen'],
+    ['10', 'tien'], ['11', 'elf'], ['12', 'twaalf'], ['13', 'dertien'], ['14', 'veertien'], ['15', 'vijftien'], ['16', 'zestien'], ['17', 'zeventien'], ['18', 'achttien'], ['19', 'negentien'],
+    ['20', 'twintig'], ['21', 'eenentwintig', 'Primeiro a unidade: um-e-vinte.'], ['22', 'tweeëntwintig', 'Primeiro a unidade: dois-e-vinte.'], ['30', 'dertig'], ['40', 'veertig'], ['50', 'vijftig'],
+    ['60', 'zestig'], ['70', 'zeventig'], ['80', 'tachtig'], ['90', 'negentig'], ['100', 'honderd'], ['1000', 'duizend']
+  ] },
+  { id: 'tens', group: 'Números e tempo', name: 'Dezenas ao contrário (21 a 99)', type: 'gen', items: TENS_CARDS },
+  { id: 'hund', group: 'Números e tempo', name: 'Centenas e anos', type: 'vocab', items: [
+    ['101', 'honderdeen|honderd een'], ['125', 'honderdvijfentwintig'], ['200', 'tweehonderd'], ['350', 'driehonderdvijftig'], ['999', 'negenhonderdnegenennegentig'],
+    ['1100', 'elfhonderd|duizend honderd', 'Entre 1100 e 1999 é normal contar em centenas.'], ['1250', 'twaalfhonderdvijftig|duizend tweehonderdvijftig', 'Doze centos e cinquenta.'], ['2000', 'tweeduizend'],
+    ['o ano 1987', 'negentien zevenentachtig|negentienzevenentachtig', 'Dezanove, oitenta e sete.'], ['o ano 2026', 'tweeduizend zesentwintig|twintig zesentwintig'], ['um milhão', 'een miljoen']
+  ] },
+  { id: 'ord', group: 'Números e tempo', name: 'Ordinais', type: 'vocab', items: [
+    ['1.º', 'eerste', 'Irregular.'], ['2.º', 'tweede'], ['3.º', 'derde', 'Irregular.'], ['4.º', 'vierde'], ['5.º', 'vijfde'], ['6.º', 'zesde'], ['7.º', 'zevende'], ['8.º', 'achtste', 'Irregular: leva -ste.'], ['9.º', 'negende'],
+    ['10.º', 'tiende'], ['11.º', 'elfde'], ['12.º', 'twaalfde'], ['20.º', 'twintigste', 'A partir de 20 leva -ste.'], ['21.º', 'eenentwintigste'], ['100.º', 'honderdste']
+  ] },
+  { id: 'price', group: 'Números e tempo', name: 'Preços', type: 'gen', items: PRICE_CARDS },
+  { id: 'time', group: 'Números e tempo', name: 'Dias da semana', type: 'vocab', items: [
+    ['segunda-feira', 'maandag'], ['terça-feira', 'dinsdag'], ['quarta-feira', 'woensdag'], ['quinta-feira', 'donderdag'], ['sexta-feira', 'vrijdag'], ['sábado', 'zaterdag'], ['domingo', 'zondag'],
+    ['hoje', 'vandaag'], ['amanhã', 'morgen'], ['ontem', 'gisteren']
+  ] },
+  { id: 'months', group: 'Números e tempo', name: 'Meses', type: 'vocab', items: [
+    ['janeiro', 'januari'], ['fevereiro', 'februari'], ['março', 'maart'], ['abril', 'april'], ['maio', 'mei'], ['junho', 'juni'], ['julho', 'juli'], ['agosto', 'augustus'], ['setembro', 'september'], ['outubro', 'oktober'], ['novembro', 'november'], ['dezembro', 'december']
+  ] },
+  { id: 'clock', group: 'Números e tempo', name: 'Ver as horas', type: 'gen', items: CLOCK_CARDS },
+  { id: 'when', group: 'Números e tempo', name: 'Quando: expressões de tempo', type: 'vocab', items: [
+    ['Que horas são?', 'Hoe laat is het?'], ['A que horas?', 'Hoe laat?|Om hoe laat?'], ['às três horas', 'om drie uur'], ['meia hora', 'een half uur'], ['um quarto de hora', 'een kwartier'], ['o minuto', 'de minuut'], ['a hora', 'het uur'],
+    ['Que dia é hoje?', 'Welke dag is het vandaag?'], ['Hoje é segunda-feira.', 'Vandaag is het maandag.'], ['na segunda-feira', 'op maandag'], ['dia 9 de novembro', 'negen november'],
+    ['esta manhã', 'vanmorgen|vanochtend'], ['esta tarde', 'vanmiddag'], ['hoje ao serão', 'vanavond'], ['esta madrugada', 'vannacht'], ['depois de amanhã', 'overmorgen'], ['anteontem', 'eergisteren'],
+    ['de manhã', "'s ochtends|'s morgens"], ['à tarde', "'s middags"], ['ao serão', "'s avonds"], ['de noite', "'s nachts"],
+    ['a próxima semana', 'volgende week'], ['a semana passada', 'vorige week'], ['todos os dias', 'elke dag'], ['ao fim de semana', 'in het weekend'],
+    ['primavera', 'de lente|het voorjaar'], ['verão', 'de zomer'], ['outono', 'de herfst|het najaar'], ['inverno', 'de winter']
+  ] },
+  { id: 'neg', group: 'Básicos', name: 'niet ou geen?', type: 'cloze', items: [
+    ['Ik heb ___ auto.', 'niet / geen', 'Não tenho carro.', 'geen', 'Substantivo com een: usa-se geen.'],
+    ['Ik drink ___ koffie.', 'niet / geen', 'Não bebo café.', 'geen', 'Substantivo sem artigo: usa-se geen.'],
+    ['Wij hebben ___ tijd.', 'niet / geen', 'Não temos tempo.', 'geen', 'Substantivo sem artigo: usa-se geen.'],
+    ['Zij heeft ___ kinderen.', 'niet / geen', 'Ela não tem filhos.', 'geen', 'Plural sem artigo: usa-se geen.'],
+    ['Ik werk vandaag ___.', 'niet / geen', 'Hoje não trabalho.', 'niet', 'Nega o verbo.'],
+    ['Ik begrijp het ___.', 'niet / geen', 'Não percebo.', 'niet', 'Nega o verbo.'],
+    ['Ik kom morgen ___.', 'niet / geen', 'Amanhã não venho.', 'niet', 'Nega o verbo.'],
+    ['Hij is ___ thuis.', 'niet / geen', 'Ele não está em casa.', 'niet', 'Nega o verbo zijn com um lugar.'],
+    ['Dat is ___ goed.', 'niet / geen', 'Isso não está bem.', 'niet', 'Nega o adjetivo.'],
+    ['Ik ken de man ___.', 'niet / geen', 'Não conheço o homem.', 'niet', 'Com de ou het usa-se niet.']
+  ] },
+  { id: 'objp', group: 'Básicos', name: 'Pronomes objeto', type: 'vocab', items: [
+    ['me, a mim', 'mij|me'], ['te, a ti', 'jou|je'], ['o senhor, a si (formal)', 'u'], ['o, a ele', 'hem'], ['a, a ela', 'haar'], ['nos, a nós', 'ons'], ['vocês, a vocês', 'jullie'], ['os, a eles', 'hen|hun|ze', 'Na conversa diz-se quase sempre ze.']
+  ] },
+  { id: 'prep', group: 'Básicos', name: 'Preposições', type: 'vocab', items: [
+    ['em, dentro de', 'in'], ['em cima de', 'op'], ['junto de, em casa de', 'bij'], ['com', 'met'], ['sem', 'zonder'], ['de (posse, origem)', 'van'], ['para (destino)', 'naar'], ['de (vindo de)', 'uit', 'Ik kom uit Portugal.'],
+    ['antes de', 'voor'], ['depois de', 'na'], ['debaixo de', 'onder'], ['por cima de', 'boven'], ['entre', 'tussen'], ['ao lado de', 'naast'], ['atrás de', 'achter'], ['em frente de', 'tegenover'], ['às (horas)', 'om'], ['até', 'tot']
+  ] },
+  { id: 'art', group: 'Básicos', name: 'de ou het?', type: 'art', items: [
+    ['man', 'homem', 'de'], ['vrouw', 'mulher', 'de'], ['kind', 'criança', 'het'], ['huis', 'casa', 'het'], ['auto', 'carro', 'de'], ['fiets', 'bicicleta', 'de'],
+    ['boek', 'livro', 'het'], ['tafel', 'mesa', 'de'], ['stoel', 'cadeira', 'de'], ['raam', 'janela', 'het'], ['deur', 'porta', 'de'], ['straat', 'rua', 'de'],
+    ['water', 'água', 'het'], ['koffie', 'café', 'de'], ['bier', 'cerveja', 'het'], ['brood', 'pão', 'het'], ['kaas', 'queijo', 'de'], ['werk', 'trabalho', 'het'],
+    ['dag', 'dia', 'de'], ['week', 'semana', 'de'], ['maand', 'mês', 'de'], ['jaar', 'ano', 'het'], ['land', 'país', 'het'], ['stad', 'cidade', 'de'],
+    ['meisje', 'rapariga', 'het'], ['jongen', 'rapaz', 'de'], ['hond', 'cão', 'de'], ['geld', 'dinheiro', 'het'], ['tijd', 'tempo', 'de'], ['trein', 'comboio', 'de']
+  ] },
+  { id: 'work', group: 'Básicos', name: 'No trabalho', type: 'vocab', items: [
+    ['o colega', 'de collega'], ['a chefia', 'de leidinggevende'], ['a reunião', 'de vergadering'], ['a pausa', 'de pauze'], ['o turno', 'de dienst|de ploeg'],
+    ['o horário de turnos', 'het rooster'], ['o armazém', 'het magazijn'], ['a ferramenta, as ferramentas', 'het gereedschap'], ['a segurança', 'de veiligheid'],
+    ['a qualidade', 'de kwaliteit'], ['o erro', 'de fout'], ['o problema', 'het probleem'], ['limpar', 'schoonmaken'], ['a limpeza', 'de schoonmaak'],
+    ['Tenho uma pergunta.', 'Ik heb een vraag.'], ['Podes ajudar-me?', 'Kun je me helpen?'], ['Está pronto.', 'Het is klaar.']
+  ] },
+  { id: 'plur', group: 'Vocabulário', name: 'Plurais', type: 'vocab', items: [
+    ['plural de boek (livro)', 'boeken', 'Regra geral: -en.'], ['plural de fiets (bicicleta)', 'fietsen'], ['plural de stoel (cadeira)', 'stoelen'], ['plural de deur (porta)', 'deuren'],
+    ['plural de man (homem)', 'mannen', 'Vogal curta: a consoante duplica.'], ['plural de bus (autocarro)', 'bussen', 'Vogal curta: a consoante duplica.'],
+    ['plural de jaar (ano)', 'jaren', 'Vogal longa em sílaba aberta: só um a.'], ['plural de week (semana)', 'weken', 'Vogal longa em sílaba aberta: só um e.'], ['plural de uur (hora)', 'uren'],
+    ['plural de huis (casa)', 'huizen', 's vira z, como no verbo ao contrário.'], ['plural de brief (carta)', 'brieven', 'f vira v.'],
+    ['plural de tafel (mesa)', 'tafels', 'Termina em -el, -er, -en: leva -s.'], ['plural de collega (colega)', "collega's", 'Vogal final: leva apóstrofo e s.'], ['plural de auto (carro)', "auto's", 'Vogal final: leva apóstrofo e s.'], ['plural de meisje (rapariga)', 'meisjes', 'Termina em -je: leva -s.'],
+    ['plural de kind (criança)', 'kinderen', 'Irregular.'], ['plural de ei (ovo)', 'eieren', 'Irregular.'], ['plural de stad (cidade)', 'steden', 'Irregular.'], ['plural de dag (dia)', 'dagen', 'Irregular: a fica longo.']
+  ] },
+  { id: 'adj', group: 'Vocabulário', name: 'Adjetivos e opostos', type: 'vocab', items: [
+    ['grande', 'groot'], ['pequeno', 'klein'], ['bom', 'goed'], ['mau', 'slecht'], ['novo (coisa)', 'nieuw'], ['velho', 'oud'], ['jovem', 'jong'], ['caro', 'duur'], ['barato', 'goedkoop'],
+    ['quente', 'warm|heet'], ['frio', 'koud'], ['rápido', 'snel'], ['lento', 'langzaam'], ['comprido', 'lang'], ['curto', 'kort'], ['bonito', 'mooi'], ['feio', 'lelijk'], ['fácil', 'makkelijk'], ['difícil', 'moeilijk'],
+    ['aberto', 'open'], ['fechado', 'dicht'], ['cansado', 'moe'], ['doente', 'ziek'], ['contente', 'blij'], ['ocupado, cheio', 'druk'], ['pronto', 'klaar']
+  ] },
+  { id: 'col', group: 'Vocabulário', name: 'Cores', type: 'vocab', items: [
+    ['vermelho', 'rood'], ['azul', 'blauw'], ['amarelo', 'geel'], ['verde', 'groen'], ['branco', 'wit'], ['preto', 'zwart'], ['laranja', 'oranje'], ['castanho', 'bruin'], ['cinzento', 'grijs'], ['cor-de-rosa', 'roze'], ['roxo', 'paars']
+  ] },
+  { id: 'fam', group: 'Vocabulário', name: 'Família e pessoas', type: 'vocab', items: [
+    ['a mãe', 'de moeder'], ['o pai', 'de vader'], ['os pais', 'de ouders'], ['o irmão', 'de broer'], ['a irmã', 'de zus'], ['o filho', 'de zoon'], ['a filha', 'de dochter'], ['o marido', 'de man'], ['a esposa', 'de vrouw'],
+    ['o avô', 'de opa'], ['a avó', 'de oma'], ['o amigo, o namorado', 'de vriend'], ['a amiga, a namorada', 'de vriendin'], ['o vizinho', 'de buurman'], ['a vizinha', 'de buurvrouw']
+  ] },
+  { id: 'shop', group: 'Vocabulário', name: 'Comida e compras', type: 'vocab', items: [
+    ['o leite', 'de melk'], ['o ovo', 'het ei'], ['a carne', 'het vlees'], ['o peixe', 'de vis'], ['os legumes', 'de groente'], ['a fruta', 'het fruit'], ['a maçã', 'de appel'], ['a batata', 'de aardappel'], ['o arroz', 'de rijst'],
+    ['o açúcar', 'de suiker'], ['o sal', 'het zout'], ['a manteiga', 'de boter'], ['o chá', 'de thee'], ['o pequeno-almoço', 'het ontbijt'], ['o almoço', 'de lunch'], ['o jantar', 'het avondeten'], ['a loja', 'de winkel'], ['o talão', 'de bon'],
+    ['Quanto custa?', 'Wat kost dat?|Hoeveel kost dat?'], ['Posso pagar com cartão?', 'Kan ik pinnen?'], ['Dinheiro ou cartão?', 'Contant of pinnen?'], ['Precisa de saco?', 'Heeft u een tas nodig?'], ['Mais alguma coisa?', 'Anders nog iets?'], ['É tudo, obrigado.', 'Dat was het, dank u.']
+  ] },
+  { id: 'city', group: 'Vocabulário', name: 'Na cidade e direções', type: 'vocab', items: [
+    ['à esquerda', 'links|naar links'], ['à direita', 'rechts|naar rechts'], ['sempre em frente', 'rechtdoor'], ['perto', 'dichtbij'], ['longe', 'ver'], ['a estação', 'het station'], ['a paragem de autocarro', 'de bushalte'],
+    ['o hospital', 'het ziekenhuis'], ['a farmácia', 'de apotheek'], ['a padaria', 'de bakker'], ['a câmara municipal', 'de gemeente'], ['o médico de família', 'de huisarts'],
+    ['Onde é a estação?', 'Waar is het station?'], ['Como chego à estação?', 'Hoe kom ik bij het station?'], ['Vai sempre em frente.', 'Ga rechtdoor.'], ['Vira à esquerda.', 'Ga linksaf.|Sla linksaf.'], ['Vira à direita.', 'Ga rechtsaf.|Sla rechtsaf.']
+  ] },
+  { id: 'adjinf', group: 'Básicos', name: 'Adjetivo com ou sem -e', type: 'cloze', items: [
+    ['de ___ auto', 'groot / grote', 'o carro grande', 'grote', 'Palavra de: leva -e.'],
+    ['een ___ auto', 'groot / grote', 'um carro grande', 'grote', 'Palavra de com een: leva -e na mesma.'],
+    ['het ___ huis', 'groot / grote', 'a casa grande', 'grote', 'Palavra het com het: leva -e.'],
+    ['een ___ huis', 'groot / grote', 'uma casa grande', 'groot', 'Palavra het com een: sem -e.'],
+    ['De auto is ___.', 'groot / grote', 'O carro é grande.', 'groot', 'Depois do verbo: nunca leva -e.'],
+    ['een ___ kind', 'klein / kleine', 'uma criança pequena', 'klein', 'het kind com een: sem -e.'],
+    ['de ___ kinderen', 'klein / kleine', 'as crianças pequenas', 'kleine', 'Plural: leva sempre -e.'],
+    ['___ koffie', 'warm / warme', 'café quente', 'warme', 'Palavra de sem artigo: leva -e.'],
+    ['___ water', 'koud / koude', 'água fria', 'koud', 'Palavra het sem artigo: sem -e.'],
+    ['mijn ___ fiets', 'nieuw / nieuwe', 'a minha bicicleta nova', 'nieuwe', 'Com possessivo leva sempre -e.'],
+    ['een ___ dag', 'mooi / mooie', 'um dia bonito', 'mooie', 'dag é palavra de: leva -e.'],
+    ['een ___ jaar', 'goed / goede', 'um bom ano', 'goed', 'jaar é palavra het com een: sem -e.'],
+    ['Het weer is ___.', 'mooi / mooie', 'O tempo está bonito.', 'mooi', 'Depois do verbo: nunca leva -e.'],
+    ['dit ___ boek', 'oud / oude', 'este livro velho', 'oude', 'Com dit e dat leva -e.'],
+    ['een ___ trui', 'wit / witte', 'uma camisola branca', 'witte', 'Vogal curta: a consoante duplica.']
+  ] },
+  { id: 'comp', group: 'Básicos', name: 'Comparar', type: 'vocab', items: [
+    ['maior', 'groter', 'Comparativo: adjetivo + er.'], ['maior do que', 'groter dan'], ['o maior', 'de grootste|het grootst'], ['mais pequeno', 'kleiner'],
+    ['melhor', 'beter', 'Irregular: goed, beter, best.'], ['o melhor', 'de beste|het best'], ['mais (quantidade)', 'meer', 'Irregular: veel, meer, meest.'], ['menos', 'minder'],
+    ['de preferência, prefiro', 'liever', 'Irregular: graag, liever, liefst.'], ['mais caro', 'duurder', 'Depois de r junta-se -der.'], ['mais barato', 'goedkoper'], ['mais rápido', 'sneller'],
+    ['tão grande como', 'net zo groot als'], ['O comboio é mais rápido do que o autocarro.', 'De trein is sneller dan de bus.']
+  ] },
+  { id: 'demo', group: 'Básicos', name: 'deze, dit, die, dat', type: 'cloze', items: [
+    ['___ auto is nieuw.', 'deze / dit', 'Este carro é novo.', 'Deze', 'auto é palavra de: deze.'],
+    ['___ huis is groot.', 'deze / dit', 'Esta casa é grande.', 'Dit', 'huis é palavra het: dit.'],
+    ['___ boek is van mij.', 'die / dat', 'Aquele livro é meu.', 'Dat', 'boek é palavra het: dat.'],
+    ['___ man werkt hier.', 'die / dat', 'Aquele homem trabalha aqui.', 'Die', 'man é palavra de: die.'],
+    ['___ kinderen spelen buiten.', 'deze / dit', 'Estas crianças brincam lá fora.', 'Deze', 'O plural usa sempre deze ou die.'],
+    ['___ is mijn collega.', 'dit / deze', 'Este é o meu colega.', 'Dit', 'Para apresentar alguém diz-se dit is, mesmo com pessoas.'],
+    ['___ is goed!', 'dat / die', 'Isso está bem!', 'Dat', 'Para uma ideia ou situação: dat.'],
+    ['Ik wil ___ fiets.', 'die / dat', 'Quero aquela bicicleta.', 'die', 'fiets é palavra de: die.'],
+    ['___ jaar ga ik naar Portugal.', 'dit / deze', 'Este ano vou a Portugal.', 'Dit', 'jaar é palavra het: dit.'],
+    ['___ week werk ik thuis.', 'deze / dit', 'Esta semana trabalho em casa.', 'Deze', 'week é palavra de: deze.']
+  ] },
+  { id: 'weather', group: 'Vocabulário', name: 'O tempo', type: 'vocab', items: [
+    ['Como está o tempo?', 'Hoe is het weer?'], ['Está a chover.', 'Het regent.'], ['Está a nevar.', 'Het sneeuwt.'], ['Está vento.', 'Het waait.'], ['Está sol.', 'De zon schijnt.'],
+    ['Está frio.', 'Het is koud.'], ['Está calor.', 'Het is warm.'], ['Está nublado.', 'Het is bewolkt.'], ['Está a gelar.', 'Het vriest.'], ['a chuva', 'de regen'],
+    ['o guarda-chuva', 'de paraplu'], ['o casaco', 'de jas'], ['Que tempo horrível!', 'Wat een rotweer!']
+  ] },
+  { id: 'sepv', group: 'Conjugar', name: 'Verbos separáveis', type: 'vocab', items: [
+    ['levantar-se', 'opstaan', 'ik sta op'], ['telefonar a alguém', 'opbellen', 'ik bel je op'], ['levar consigo', 'meenemen', 'ik neem het mee'], ['vir junto', 'meekomen', 'ik kom mee'],
+    ['chegar', 'aankomen', 'de trein komt aan'], ['limpar', 'schoonmaken', 'ik maak het schoon'], ['arrumar', 'opruimen', 'ik ruim op'], ['combinar, marcar', 'afspreken', 'we spreken af'],
+    ['desligar', 'uitzetten', 'ik zet het uit'], ['ligar (aparelho)', 'aanzetten', 'ik zet het aan'], ['voltar', 'terugkomen', 'ik kom terug'], ['ir-se embora', 'weggaan', 'ik ga weg'],
+    ['sair (à noite)', 'uitgaan', 'we gaan uit'], ['preencher', 'invullen', 'ik vul het in'], ['abrir (loja)', 'opengaan', 'de winkel gaat open']
+  ] },
+  { id: 'sep', group: 'Conjugar', name: 'Frases com separáveis', type: 'build', items: [
+    ['Levanto-me às sete.', 'Ik sta om zeven uur op.', '', 'opstaan: op vai para o fim.'],
+    ['Telefono-te amanhã.', 'Ik bel je morgen op.|Morgen bel ik je op.', '', 'opbellen: op vai para o fim.'],
+    ['Ele leva o portátil.', 'Hij neemt de laptop mee.', '', 'meenemen: mee vai para o fim.'],
+    ['O comboio chega às dez.', 'De trein komt om tien uur aan.', '', 'aankomen: aan vai para o fim.'],
+    ['Limpo a cozinha.', 'Ik maak de keuken schoon.', '', 'schoonmaken: schoon vai para o fim.'],
+    ['Arrumamos o quarto.', 'Wij ruimen de kamer op.', '', 'opruimen: op vai para o fim.'],
+    ['Quero levantar-me cedo.', 'Ik wil vroeg opstaan.', '', 'Com modal o verbo fica inteiro no fim.'],
+    ['Vens connosco?', 'Kom je mee?', '', 'meekomen: mee vai para o fim.'],
+    ['A loja abre às nove.', 'De winkel gaat om negen uur open.', '', 'opengaan: open vai para o fim.'],
+    ['Desligo o computador.', 'Ik zet de computer uit.', '', 'uitzetten: uit vai para o fim.'],
+    ['Acendo a luz.', 'Ik doe het licht aan.', '', 'aandoen: aan vai para o fim.'],
+    ['Combinamos amanhã.', 'We spreken morgen af.|Morgen spreken we af.', '', 'afspreken: af vai para o fim.']
+  ] },
+  { id: 'more', group: 'Conjugar', name: 'Mais verbos do dia a dia', type: 'conj', note: 'Todas as regras de escrita misturadas.', verbs: [
+    reg('spelen', 'jogar, brincar', 'speel'), reg('sturen', 'enviar', 'stuur'), reg('gebruiken', 'usar', 'gebruik'), reg('proberen', 'tentar', 'probeer'),
+    reg('wassen', 'lavar', 'was'), same('vergeten', 'esquecer', 'vergeet', { note: 'Radical termina em t.' }), reg('herhalen', 'repetir', 'herhaal'), reg('begrijpen', 'perceber', 'begrijp'),
+    reg('antwoorden', 'responder', 'antwoord', { note: 'Termina em d: o t junta-se na mesma.' }), same('sporten', 'fazer desporto', 'sport', { note: 'Radical termina em t.' }), reg('zwemmen', 'nadar', 'zwem'), reg('rennen', 'correr', 'ren'),
+    reg('verdienen', 'ganhar (dinheiro)', 'verdien'), reg('bezoeken', 'visitar', 'bezoek'), reg('verhuizen', 'mudar de casa', 'verhuis', { note: 'z passa a s.' }), reg('vertellen', 'contar (uma história)', 'vertel')
+  ] },
+  { id: 'home', group: 'Vocabulário', name: 'Em casa', type: 'vocab', items: [
+    ['a cozinha', 'de keuken'], ['a casa de banho', 'de badkamer'], ['a sanita', 'de wc|het toilet'], ['o quarto', 'de slaapkamer'], ['a sala', 'de woonkamer'], ['o jardim', 'de tuin'],
+    ['as escadas', 'de trap'], ['o frigorífico', 'de koelkast'], ['a máquina de lavar', 'de wasmachine'], ['a cama', 'het bed'], ['a luz', 'het licht'], ['a chave', 'de sleutel'],
+    ['o lixo', 'het afval'], ['a renda', 'de huur'], ['o senhorio', 'de verhuurder']
+  ] },
+  { id: 'like', group: 'Básicos', name: 'Gostos e opiniões', type: 'vocab', items: [
+    ['Gosto de café.', 'Ik houd van koffie.|Ik hou van koffie.', 'houden van + coisa ou pessoa.'], ['Gosto de ler.', 'Ik lees graag.', 'Verbo + graag = gostar de fazer.'], ['Prefiro chá.', 'Ik drink liever thee.'],
+    ['Acho isso giro.', 'Ik vind dat leuk.'], ['Não gosto disso.', 'Ik vind dat niet leuk.'], ['O que achas?', 'Wat vind jij?|Wat vind je?'], ['Concordo contigo.', 'Ik ben het met je eens.'],
+    ['Tenho vontade de ir.', 'Ik heb zin om te gaan.'], ['Apetece-me um gelado.', 'Ik heb zin in een ijsje.'], ['Que pena!', 'Wat jammer!|Jammer!'], ['Que giro!', 'Wat leuk!|Leuk!'],
+    ['Tanto faz.', 'Het maakt niet uit.'], ['Tens razão.', 'Je hebt gelijk.'], ['Não faz mal.', 'Het geeft niet.|Geeft niet.'], ['Boa sorte!', 'Succes!']
+  ] },
+  { id: 'polite', group: 'Básicos', name: 'Pedidos e ordens', type: 'vocab', items: [
+    ['Entra!', 'Kom binnen!', 'Imperativo = radical do verbo.'], ['Espera um momento.', 'Wacht even.'], ['Senta-te.', 'Ga zitten.'], ['Olha!', 'Kijk!'], ['Cuidado!', 'Pas op!'], ['Despacha-te!', 'Schiet op!'],
+    ['Não te preocupes.', 'Maak je geen zorgen.'], ['Podia ajudar-me? (muito educado)', 'Zou u me kunnen helpen?'], ['Posso fazer uma pergunta?', 'Mag ik iets vragen?'],
+    ['Pode repetir, por favor?', 'Wilt u dat herhalen?'], ['Tem um momento?', 'Heeft u even tijd?'], ['Um momento, por favor.', 'Een moment, alstublieft.']
+  ] },
+  { id: 'er', group: 'Básicos', name: 'Há: er is, er zijn', type: 'vocab', items: [
+    ['Há um problema.', 'Er is een probleem.', 'Singular: er is.'], ['Há muitas pessoas.', 'Er zijn veel mensen.', 'Plural: er zijn.'], ['Há café?', 'Is er koffie?'], ['Não há leite.', 'Er is geen melk.'],
+    ['Quantos há?', 'Hoeveel zijn er?'], ['O que se passa?', 'Wat is er?'], ['Está alguém?', 'Is er iemand?']
+  ] },
+  { id: 'body', group: 'Vocabulário', name: 'Corpo e saúde', type: 'vocab', items: [
+    ['a cabeça', 'het hoofd'], ['os olhos', 'de ogen'], ['a orelha, o ouvido', 'het oor'], ['o nariz', 'de neus'], ['a boca', 'de mond'], ['os dentes', 'de tanden'], ['a garganta', 'de keel'],
+    ['o braço', 'de arm'], ['a mão', 'de hand'], ['a perna', 'het been'], ['o pé', 'de voet'], ['as costas', 'de rug'], ['a barriga', 'de buik'],
+    ['Dói-me a cabeça.', 'Ik heb hoofdpijn.'], ['Dói-me a barriga.', 'Ik heb buikpijn.'], ['Dói-me aqui.', 'Het doet hier pijn.'], ['Estou doente.', 'Ik ben ziek.'], ['Estou constipado.', 'Ik ben verkouden.'],
+    ['Tenho febre.', 'Ik heb koorts.'], ['Preciso de um médico.', 'Ik heb een dokter nodig.'], ['Comunico que estou doente (trabalho).', 'Ik meld me ziek.'], ['As melhoras!', 'Beterschap!']
+  ] },
+  { id: 'sub', group: 'Conjugar', name: 'Frases com omdat e dat', type: 'build', items: [
+    ['Aprendo holandês porque moro aqui.', 'Ik leer Nederlands omdat ik hier woon.', '', 'omdat manda o verbo para o fim.'],
+    ['Aprendo holandês porque moro aqui. (com want)', 'Ik leer Nederlands want ik woon hier.', '', 'want não muda a ordem.'],
+    ['Acho que ele está doente.', 'Ik denk dat hij ziek is.', '', 'dat manda o verbo para o fim.'],
+    ['Sei que tens razão.', 'Ik weet dat je gelijk hebt.', '', 'dat manda o verbo para o fim.'],
+    ['Ela diz que está cansada.', 'Ze zegt dat ze moe is.', '', 'dat manda o verbo para o fim.'],
+    ['Fico em casa se chover.', 'Ik blijf thuis als het regent.', '', 'als (se) manda o verbo para o fim.'],
+    ['Não sei se ele vem.', 'Ik weet niet of hij komt.', '', 'of (se, dúvida) manda o verbo para o fim.'],
+    ['Ligo quando estiver em casa.', 'Ik bel als ik thuis ben.', '', 'als (quando) manda o verbo para o fim.'],
+    ['Fico porque tenho de trabalhar.', 'Ik blijf omdat ik moet werken.|Ik blijf omdat ik werken moet.', '', 'Com dois verbos, ambos vão para o fim.']
+  ] },
+  { id: 'adv', group: 'Básicos', name: 'Palavras de ligação', type: 'vocab', items: [
+    ['portanto', 'dus'], ['primeiro', 'eerst'], ['depois, a seguir', 'daarna|dan'], ['talvez', 'misschien'], ['claro', 'natuurlijk'], ['na verdade', 'eigenlijk'],
+    ['a sério, mesmo', 'echt'], ['já', 'al'], ['ainda', 'nog'], ['ainda não', 'nog niet'], ['só, apenas', 'alleen|maar'], ['juntos', 'samen'],
+    ['geralmente', 'meestal'], ['às vezes', 'soms'], ['sempre', 'altijd'], ['nunca', 'nooit'], ['muitas vezes', 'vaak'], ['enquanto', 'terwijl', 'Manda o verbo para o fim.']
+  ] }
+];
+
+// Suggested learning order. Each stage switches on a small set of decks.
+const ROUTE = [
+  { name: 'Primeiros passos', goal: 'Apresentar-te e dominar zijn, hebben e os verbos mais comuns.', decks: ['pron', 'hello', 'ess'] },
+  { name: 'Contar e marcar', goal: 'Números até 1000, dias, meses e perguntas.', decks: ['num', 'time', 'months', 'ask'] },
+  { name: 'Verbos regulares', goal: 'A fórmula do presente com as regras de escrita.', decks: ['reg', 'lon', 'dbl', 'small'] },
+  { name: 'Perguntar e negar', goal: 'Modais, a queda do t em jij, niet e geen.', decks: ['mod', 'inv', 'neg'] },
+  { name: 'Frases completas', goal: 'Últimas regras de escrita e ordem das palavras.', decks: ['vz', 'td', 'order', 'poss'] },
+  { name: 'Horas e dinheiro', goal: 'Dezenas ao contrário, preços e ver as horas.', decks: ['tens', 'price', 'clock', 'when'] },
+  { name: 'Gramática de base', goal: 'de ou het, plurais, adjetivos e preposições.', decks: ['art', 'plur', 'adj', 'objp', 'prep'] },
+  { name: 'Vida prática', goal: 'Compras, direções, família, cores e trabalho.', decks: ['shop', 'city', 'fam', 'col', 'work'] },
+  { name: 'Descrever e comparar', goal: 'Adjetivos com -e, comparar, este e aquele, e o tempo.', decks: ['adjinf', 'comp', 'demo', 'weather'] },
+  { name: 'Verbos separáveis', goal: 'opstaan, opbellen, meenemen e mais verbos do dia a dia.', decks: ['sepv', 'sep', 'more', 'home'] },
+  { name: 'Opinar e pedir', goal: 'Dizer do que gostas, pedir com educação e falar de saúde.', decks: ['like', 'polite', 'er', 'body'] },
+  { name: 'Frases ligadas', goal: 'Juntar frases com omdat, dat, als e palavras de ligação.', decks: ['sub', 'adv'] },
+  { name: 'Falar do passado', goal: 'O passado mais usado, centenas, anos e ordinais.', decks: ['past', 'hund', 'ord'] }
+];
+
+const DIALOGS = [
+  { title: 'Apresentar-se', lines: [
+    ['A', 'Hallo, ik ben Sanne. Hoe heet jij?', 'Olá, sou a Sanne. Como te chamas?'],
+    ['B', 'Ik heet Rui. Aangenaam.', 'Chamo-me Rui. Muito prazer.'],
+    ['A', 'Waar kom je vandaan?', 'De onde és?'],
+    ['B', 'Ik kom uit Portugal, maar ik woon nu in Utrecht.', 'Sou de Portugal, mas agora moro em Utrecht.'],
+    ['A', 'Wat voor werk doe je?', 'Em que trabalhas?'],
+    ['B', 'Ik werk in een fabriek. En jij?', 'Trabalho numa fábrica. E tu?'],
+    ['A', 'Ik ben verpleegkundige.', 'Sou enfermeira.'] ] },
+  { title: 'No café', lines: [
+    ['A', 'Goedemiddag, wat mag het zijn?', 'Boa tarde, o que vai ser?'],
+    ['B', 'Mag ik een koffie en een broodje kaas?', 'Pode ser um café e uma sandes de queijo?'],
+    ['A', 'Natuurlijk. Anders nog iets?', 'Claro. Mais alguma coisa?'],
+    ['B', 'Nee, dank u. Dat was het.', 'Não, obrigado. É tudo.'],
+    ['A', 'Dat is dan zeven euro vijftig.', 'São sete euros e cinquenta.'],
+    ['B', 'Kan ik pinnen?', 'Posso pagar com cartão?'],
+    ['A', 'Ja hoor, dat kan.', 'Sim, pode.'] ] },
+  { title: 'No supermercado', lines: [
+    ['A', 'Pardon, waar vind ik de melk?', 'Com licença, onde encontro o leite?'],
+    ['B', 'In gang vijf, aan de linkerkant.', 'No corredor cinco, do lado esquerdo.'],
+    ['A', 'Dank u wel.', 'Muito obrigado.'],
+    ['B', 'Graag gedaan. Fijne dag nog!', 'De nada. Continuação de bom dia!'],
+    ['A', 'Dank u, insgelijks.', 'Obrigado, igualmente.'] ] },
+  { title: 'No trabalho', lines: [
+    ['A', 'Goedemorgen! Hoe gaat het?', 'Bom dia! Como estás?'],
+    ['B', 'Goed, dank je. En met jou?', 'Bem, obrigado. E tu?'],
+    ['A', 'Prima. Hoe laat begint de vergadering?', 'Ótimo. A que horas começa a reunião?'],
+    ['B', 'Om half tien.', 'Às nove e meia.'],
+    ['A', 'Dus om negen uur dertig?', 'Portanto, às 9:30?'],
+    ['B', 'Ja, precies. Tot straks!', 'Sim, exatamente. Até já!'] ] },
+  { title: 'Marcar uma consulta', lines: [
+    ['A', 'Goedemorgen, ik wil graag een afspraak maken.', 'Bom dia, queria marcar uma consulta.'],
+    ['B', 'Natuurlijk. Wanneer kunt u komen?', 'Claro. Quando pode vir?'],
+    ['A', 'Morgen om drie uur, kan dat?', 'Amanhã às três, pode ser?'],
+    ['B', 'Ja, dat kan. Wat is uw naam?', 'Sim, pode. Qual é o seu nome?'],
+    ['A', 'Mijn naam is Rui Costa.', 'O meu nome é Rui Costa.'],
+    ['B', 'Dank u. Tot morgen!', 'Obrigado. Até amanhã!'] ] }
+];
+
+const SLOTS_PER_PERSON = ['ik', 'jij', 'u', 'hij', 'wij'];
+const RANDOM_PERSONS = ['ik', 'ik', 'jij', 'jij', 'u', 'hij', 'zijs', 'wij', 'jullie', 'zijp'];
+const SLOT_VARIANTS = { hij: ['hij', 'zijs', 'het'], wij: ['wij', 'jullie', 'zijp'] };
+
+const first = s => s.split('|')[0];
+const pretty = s => s.split('|').join(' / ');
+function formOf(v, p) {
+  if (p === 'ik') return v.ik;
+  if (p === 'jij') return v.jij;
+  if (p === 'u') return v.u || v.jij;
+  if (p === 'hij' || p === 'zijs' || p === 'het') return v.hij;
+  return v.inf;
+}
+
+function buildCards() {
+  const list = [];
+  for (const d of DECKS) {
+    if (d.type === 'conj') {
+      for (const v of d.verbs) {
+        if (d.perPerson) for (const slot of SLOTS_PER_PERSON) list.push({ id: `${d.id}:${v.inf}:${slot}`, deck: d, verb: v, slot });
+        else list.push({ id: `${d.id}:${v.inf}`, deck: d, verb: v });
+      }
+    } else if (d.type === 'vocab') {
+      for (const [pt, nl, note] of d.items) list.push({ id: `${d.id}:${pt}:${first(nl)}`, deck: d, pt, nl, note });
+    } else if (d.type === 'build') {
+      for (const [pt, nl, start, note] of d.items) list.push({ id: `${d.id}:${pt}`, deck: d, pt, nl, start, note });
+    } else if (d.type === 'gen') {
+      for (const g of d.items) list.push({ id: `${d.id}:${g.key}`, deck: d, gen: g.make });
+    } else if (d.type === 'cloze') {
+      for (const [s, verb, pt, a, note] of d.items) list.push({ id: `${d.id}:${s}`, deck: d, s, verb, pt, nl: a, note });
+    } else {
+      for (const [w, pt, art] of d.items) list.push({ id: `${d.id}:${w}`, deck: d, w, pt, art });
+    }
+  }
+  return list;
+}
+const CARDS = buildCards();
+const CARD_BY_ID = new Map(CARDS.map(c => [c.id, c]));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+/* ---------- State and persistence ---------- */
+const KEY = 'ponskaarten.v1';
+const INTERVAL = { 1: 1, 2: 1, 3: 3, 4: 7, 5: 21 };
+const NEW_BATCH = 12;
+const MAX_DUE_FOR_NEW = 30;
+const today = () => { const d = new Date(); return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 86400000); };
+
+function defaults() {
+  return { v: 1, updatedAt: 0, cards: {}, decks: ['pron', 'ess', 'mod', 'reg'], mode: 'flip', front: 'pt', daily: {} };
+}
+function normalise(raw) {
+  const d = defaults();
+  if (!raw || typeof raw !== 'object') return migrate(d);
+  const valid = new Set(DECKS.map(x => x.id));
+  const decks = Array.isArray(raw.decks) ? raw.decks.filter(id => valid.has(id)) : d.decks;
+  return migrate({ ...d, ...raw, decks, cards: raw.cards || {}, daily: raw.daily || {} });
+}
+// v2 split months out of the "time" deck and switched numbers, days and months on.
+// v3 replaced personal example sentences with generic ones and keeps their progress.
+const RENAMED_V3 = {
+  'hello:Chamo-me ': 'hello:Chamo-me... (o teu nome):Ik heet ...',
+  'hello:Sou de ': 'hello:Sou de... (país):Ik kom uit ...',
+  'hello:Moro em ': 'hello:Moro em... (cidade):Ik woon in ...',
+  'inv:___ je in ': 'inv:___ je in Amsterdam?'
+};
+function migrate(s) {
+  if ((s.mig || 0) < 2) {
+    for (const key of Object.keys(s.cards)) {
+      if (!key.startsWith('time:') || CARD_BY_ID.has(key)) continue;
+      const moved = 'months:' + key.slice(5);
+      if (CARD_BY_ID.has(moved)) s.cards[moved] = s.cards[key];
+      delete s.cards[key];
+    }
+    s.decks = DECKS.map(d => d.id).filter(id => s.decks.includes(id) || ['num', 'time', 'months'].includes(id));
+    s.mig = 2;
+  }
+  if (s.mig < 3) {
+    for (const [prefix, to] of Object.entries(RENAMED_V3)) {
+      for (const key of Object.keys(s.cards)) {
+        if (key.startsWith(prefix) && !CARD_BY_ID.has(key)) { s.cards[to] = s.cards[key]; delete s.cards[key]; }
+      }
+    }
+    s.mig = 3;
+  }
+  return s;
+}
+function loadLocal() {
+  try { return normalise(JSON.parse(localStorage.getItem(KEY))); } catch (e) { return defaults(); }
+}
+let st = loadLocal();
+let docRef = null, syncTimer = null, syncing = false, syncAgain = false;
+
+function save() {
+  st.updatedAt = Date.now();
+  try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { /* storage may be blocked; the session still works */ }
+  if (docRef) { clearTimeout(syncTimer); syncTimer = setTimeout(pushRemote, 1500); }
+}
+async function pushRemote() {
+  if (!docRef) return;
+  if (syncing) { syncAgain = true; return; }
+  syncing = true;
+  try { await docRef.set({ updatedAt: st.updatedAt, payload: JSON.stringify(st) }); setSync('Progresso guardado na tua conta.'); }
+  catch (e) { setSync('Sem ligação à conta: progresso guardado só neste browser.'); }
+  syncing = false;
+  if (syncAgain) { syncAgain = false; pushRemote(); }
+}
+function setSync(text) { document.getElementById('sync').textContent = text; }
+async function initSync() {
+  try {
+    if (!window.claude || !window.claude.use) return;
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    if (!db || !user) return;
+    const id = await user.id();
+    if (!id) return;
+    const ref = db.doc(`data/users/${id}/progress`);
+    const snap = await ref.get();
+    docRef = ref;
+    const body = snap.exists ? snap.data() : null;
+    if (body && body.updatedAt > st.updatedAt) {
+      st = normalise(JSON.parse(body.payload));
+      try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { /* see save() */ }
+      if (!sess.answered) startSession();
+      renderAll();
+    } else if (st.updatedAt > 0 && (!body || st.updatedAt > body.updatedAt)) {
+      pushRemote();
+    }
+    setSync('Progresso guardado na tua conta.');
+  } catch (e) { setSync('Sem ligação à conta: progresso guardado só neste browser.'); }
+}
+
+/* ---------- Session ---------- */
+let sess = { queue: [], size: 0, failed: new Set(), total: 0, ok: 0, answered: 0, cram: false, cur: null };
+
+function activeCards() { const s = new Set(st.decks); return CARDS.filter(c => s.has(c.deck.id)); }
+function rec(id) { return st.cards[id]; }
+function isDue(c) { const r = rec(c.id); return r && r.due <= today(); }
+
+// Takes unseen cards round-robin across decks, so a long first deck cannot hide the others.
+function pickNewCards(pool, limit) {
+  const byDeck = shuffle(DECKS.map(d => pool.filter(c => c.deck === d && !rec(c.id))).filter(a => a.length));
+  const out = [];
+  for (let i = 0; out.length < limit && byDeck.some(a => i < a.length); i++) {
+    for (const cards of byDeck) if (i < cards.length && out.length < limit) out.push(cards[i].id);
+  }
+  return out;
+}
+
+function hardCards() {
+  return CARDS.filter(c => rec(c.id) && rec(c.id).l > 0).sort((a, b) => rec(b.id).l - rec(a.id).l).slice(0, 15);
+}
+
+function startSession({ extraNew = false, cram = false, only = null } = {}) {
+  const pool = activeCards();
+  let ids;
+  if (only) {
+    ids = shuffle(only);
+    cram = true;
+  } else if (cram) {
+    ids = shuffle(pool.map(c => c.id));
+  } else {
+    const due = shuffle(pool.filter(isDue).map(c => c.id));
+    const fresh = (extraNew || due.length < MAX_DUE_FOR_NEW) ? pickNewCards(pool, NEW_BATCH) : [];
+    ids = due.concat(shuffle(fresh));
+  }
+  sess = { queue: ids, size: ids.length, failed: new Set(), total: 0, ok: 0, answered: 0, cram, cur: null };
+  nextCard();
+}
+
+function viewOf(card) {
+  if (card.deck.type === 'conj') {
+    let p = card.slot;
+    if (!p) p = pick(RANDOM_PERSONS);
+    else if (SLOT_VARIANTS[p]) p = pick(card.deck.id === 'ess' || card.deck.id === 'mod' ? SLOT_VARIANTS[p] : SLOT_VARIANTS[p].filter(x => x !== 'het'));
+    const v = card.verb, form = formOf(v, p), label = PERSONS[p].nl;
+    return { kind: 'conj', person: p, verb: v, form, label,
+      accepted: form.split('|'), answer: `${label} ${pretty(form)}`,
+      say: `${label} ${first(form)}`, note: v.note || card.deck.note || '' };
+  }
+  if (card.deck.type === 'build') {
+    const sentence = first(card.nl);
+    const inOrder = sentence.replace(/[.?!]$/, '').split(' ');
+    inOrder[0] = inOrder[0].toLowerCase();
+    let tokens = shuffle(inOrder.slice());
+    for (let i = 0; i < 8 && tokens.join(' ') === inOrder.join(' '); i++) tokens = shuffle(inOrder.slice());
+    return { kind: 'build', tokens, accepted: card.nl.split('|'), answer: pretty(card.nl), say: sentence, note: card.note };
+  }
+  if (card.deck.type === 'gen') {
+    const g = card.gen();
+    return { kind: 'gen', q: g.q, sub: g.sub, accepted: g.a, answer: g.a.join(' / '), say: g.a[0], note: g.note };
+  }
+  if (card.deck.type === 'cloze') {
+    return { kind: 'cloze', accepted: [card.nl], answer: card.nl, say: card.s.replace('___', card.nl), note: card.note };
+  }
+  if (card.deck.type === 'art') {
+    return { kind: 'art', accepted: [card.art, `${card.art} ${card.w}`], answer: `${card.art} ${card.w}`, say: `${card.art} ${card.w}`, note: '' };
+  }
+  return { kind: 'vocab', accepted: card.nl.split('|'), answer: pretty(card.nl), say: first(card.nl).replace(/\s*\.\.\.$/, ''), note: card.note || '' };
+}
+function nextCard() {
+  const id = sess.queue[0];
+  sess.cur = id ? { card: CARD_BY_ID.get(id), view: viewOf(CARD_BY_ID.get(id)), revealed: false, typed: '', verdict: null, built: [] } : null;
+}
+
+const normaliseAnswer = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[.,!?;:'’]/g, '').replace(/\s+/g, ' ').trim();
+const SUBJECTS = ['ik', 'jij', 'je', 'u', 'hij', 'zij', 'ze', 'het', 'wij', 'we', 'jullie'];
+function checkAnswer(view, typed) {
+  let t = normaliseAnswer(typed);
+  if (view.kind === 'gen') t = t.replace(/^het is /, '');
+  if (view.kind === 'conj') {
+    const parts = t.split(' ');
+    if (parts.length === 2 && SUBJECTS.includes(parts[0])) t = parts[1];
+  }
+  return view.accepted.some(a => normaliseAnswer(a) === t || (a.endsWith('...') && t.startsWith(normaliseAnswer(a) + ' ')));
+}
+
+function grade(ok) {
+  const c = sess.cur.card, firstTry = !sess.failed.has(c.id), d = today();
+  sess.answered++;
+  if (firstTry) { sess.total++; if (ok) sess.ok++; }
+  if (!sess.cram) {
+    const r = st.cards[c.id] || { box: 0, due: 0 };
+    if (firstTry) {
+      const day = st.daily[d] || (st.daily[d] = { n: 0, ok: 0 });
+      day.n++; if (ok) day.ok++;
+      r.l = ok ? Math.max(0, (r.l || 0) - 1) : (r.l || 0) + 1; // lapse count drives the "most missed" list
+    }
+    if (ok) { r.box = firstTry ? Math.min(5, Math.max(r.box, 1) + 1) : 1; r.due = d + INTERVAL[r.box]; }
+    else { r.box = 1; r.due = d; }
+    st.cards[c.id] = r;
+    save();
+  }
+  sess.queue.shift();
+  if (!ok) { sess.failed.add(c.id); sess.queue.splice(Math.min(3, sess.queue.length), 0, c.id); }
+  nextCard();
+  renderAll();
+  if (st.mode === 'write') focusInput();
+}
+
+/* ---------- Rendering ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const isLong = s => s.length > 16;
+
+function personsStrip(active) {
+  const col = key => `<span class="pcol${key === active ? ' on' : ''}"><span>${PERSONS[key].nl}</span><span class="hole${key === active ? ' on' : ''}"></span></span>`;
+  const group = (label, keys) => `<div class="pgroup"><small>${label}</small><div class="pcols">${keys.map(col).join('')}</div></div>`;
+  return `<div class="persons" aria-hidden="true">${group('singular', ['ik', 'jij', 'u', 'hij', 'zijs', 'het'])}${group('plural', ['wij', 'jullie', 'zijp'])}</div>`;
+}
+function formsTable(v, active) {
+  const inGroup = keys => keys.includes(active) ? ' class="hit"' : '';
+  const row = (label, form, keys) => `<div${inGroup(keys)}><dt>${label}</dt><dd>${esc(pretty(form))}</dd></div>`;
+  return `<dl class="forms">${row('ik', v.ik, ['ik'])}${row('jij', v.jij, ['jij'])}${row('u', v.u || v.jij, ['u'])}${row('hij · zij · het', v.hij, ['hij', 'zijs', 'het'])}${row('wij · jullie · zij', v.inf, ['wij', 'jullie', 'zijp'])}</dl>`;
+}
+const canSpeak = () => 'speechSynthesis' in window;
+function nlVoice() {
+  const vs = speechSynthesis.getVoices();
+  return vs.find(v => v.lang.toLowerCase() === 'nl-nl') || vs.find(v => v.lang.toLowerCase().startsWith('nl'));
+}
+function speak(text, rate = .9) {
+  if (!canSpeak()) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'nl-NL'; u.rate = rate;
+  const v = nlVoice();
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+function frontIsDutch(cur) {
+  return cur.view.kind === 'vocab' && st.mode === 'flip' && st.front === 'nl';
+}
+
+// Dictation: what the learner hears must be typed exactly, so every check runs against the spoken text.
+function meaningOf(cur) {
+  const { card, view } = cur;
+  if (view.kind === 'conj') return `${view.verb.inf}: ${view.verb.pt}`;
+  if (view.kind === 'gen') return view.q;
+  return card.pt;
+}
+function checkListen(view, typed) {
+  const t = normaliseAnswer(typed);
+  const options = [view.say];
+  if (view.kind === 'vocab' || view.kind === 'gen' || view.kind === 'art') options.push(...view.accepted);
+  if (view.kind === 'conj') options.push(...view.accepted.map(f => `${view.label} ${f}`));
+  return options.some(o => normaliseAnswer(o) === t);
+}
+function questionHtml(cur) {
+  const { card, view } = cur;
+  if (st.mode === 'listen') {
+    return `<div class="q"><p class="q-main">Ouve e escreve</p><p class="q-sub">Escreve exatamente o que ouves em holandês.</p></div>`;
+  }
+  if (view.kind === 'conj') {
+    const p = PERSONS[view.person];
+    return `<div class="q"><p class="q-main">${esc(view.label)} <u>&nbsp;</u></p>
+      <p class="q-sub"><b>${esc(view.verb.inf)}</b> · ${esc(view.verb.pt)} · ${esc(view.label)} = ${esc(p.pt)}</p></div>`;
+  }
+  if (view.kind === 'build') {
+    const placed = cur.built.map(i => `<button class="chip placed" type="button" data-remove="${i}"${cur.revealed ? ' disabled' : ''}>${esc(view.tokens[i])}</button>`).join('');
+    return `<div class="q"><p class="q-main long">${esc(card.pt)}</p>
+      <p class="q-sub">${card.start ? `Começa por <b>${esc(card.start)}</b>` : 'Ordena as palavras'}</p></div>
+      <div class="built">${placed || '<span>Toca nas palavras pela ordem certa</span>'}</div>`;
+  }
+  if (view.kind === 'gen') {
+    return `<div class="q"><p class="q-main">${esc(view.q)}</p><p class="q-sub">${esc(view.sub)}</p></div>`;
+  }
+  if (view.kind === 'cloze') {
+    const html = esc(card.s).replace('___', '<u>&nbsp;</u>');
+    return `<div class="q"><p class="q-main${isLong(card.s) ? ' long' : ''}">${html}</p>
+      <p class="q-sub"><b>${esc(card.verb)}</b> · ${esc(card.pt)}</p></div>`;
+  }
+  if (view.kind === 'art') {
+    return `<div class="q"><p class="q-main"><u>&nbsp;</u> ${esc(card.w)}</p><p class="q-sub">${esc(card.pt)}</p></div>`;
+  }
+  const text = frontIsDutch(cur) ? pretty(card.nl) : card.pt;
+  return `<div class="q"><p class="q-main${isLong(text) ? ' long' : ''}">${esc(text)}</p>
+    <p class="q-sub">${frontIsDutch(cur) ? 'O que significa?' : 'Como se diz em holandês?'}</p></div>`;
+}
+function answerHtml(cur) {
+  const { card, view, verdict, typed } = cur;
+  const listening = st.mode === 'listen';
+  const main = listening ? view.say : frontIsDutch(cur) ? card.pt : view.answer;
+  let verdictHtml = '';
+  if ((st.mode !== 'flip' || view.kind === 'build') && verdict !== null) {
+    verdictHtml = verdict
+      ? `<p class="verdict ok">Certo.</p>`
+      : `<p class="verdict no">Escreveste: ${esc(typed || '(em branco)')}</p>`;
+  }
+  return `<div class="a">${verdictHtml}<p class="a-main${isLong(main) ? ' long' : ''}">${esc(main)}</p>
+    ${listening ? `<p class="q-sub">Significa: <b>${esc(meaningOf(cur))}</b></p>` : ''}
+    ${view.kind === 'conj' ? formsTable(view.verb, view.person) : ''}
+    ${view.note ? `<p class="note">${esc(view.note)}</p>` : ''}</div>`;
+}
+function levelsHtml(card) {
+  const box = rec(card.id) ? rec(card.id).box : 0;
+  const holes = [1, 2, 3, 4, 5].map(n => `<span class="hole${n <= box ? ' on' : ''}"></span>`).join('');
+  return `<div class="levels" title="Caixa atual"><span>${box ? 'caixa ' + box : 'novo'}</span>${holes}</div>`;
+}
+
+function renderCard() {
+  const el = $('card'), act = $('actions'), cur = sess.cur;
+  if (!cur) { renderEnd(el, act); return; }
+  const listening = st.mode === 'listen';
+  const speakable = canSpeak() && (cur.revealed || frontIsDutch(cur)) && !listening;
+  // iOS only lets a page speak inside a tap, and every new card is rendered from one.
+  if (listening && !cur.revealed && !cur.spoken) { cur.spoken = true; speak(cur.view.say); }
+  el.innerHTML = `
+    <div class="card-top"><b>${esc(cur.card.deck.name)}</b><span>${sess.cram ? 'revisão livre' : ''}</span></div>
+    ${cur.view.kind === 'conj' ? personsStrip(cur.view.person) : ''}
+    <div class="face">${questionHtml(cur)}${cur.revealed ? answerHtml(cur) : ''}</div>
+    <div class="card-foot">${levelsHtml(cur.card)}${speakable ? '<button class="speak" id="speak" type="button">Ouvir</button>' : ''}
+      ${listening ? '<span class="listen-btns"><button class="speak" id="say-again" type="button">Ouvir outra vez</button><button class="speak" id="say-slow" type="button">Mais devagar</button></span>' : ''}</div>`;
+  const sp = $('speak');
+  if (sp) sp.onclick = () => speak(cur.view.say);
+  if ($('say-again')) $('say-again').onclick = () => speak(cur.view.say);
+  if ($('say-slow')) $('say-slow').onclick = () => speak(cur.view.say, .6);
+
+  if (cur.view.kind === 'build' && !listening) {
+    renderBuildActions(cur, act);
+  } else if (st.mode === 'write' || listening) {
+    act.innerHTML = cur.revealed
+      ? `<form class="write" id="wform" style="flex:1 1 100%"><button class="btn primary" id="next" type="submit">Seguinte<kbd>Enter</kbd></button></form>
+         ${cur.verdict === false ? '<button class="linkish" id="override" type="button">Foi só um erro de escrita, contar como certo</button>' : ''}`
+      : `<form class="write" id="wform" style="flex:1 1 100%"><input id="answer" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="A tua resposta" placeholder="${listening ? 'Escreve o que ouves' : 'Escreve em holandês'}" value="${esc(cur.typed)}"><button class="btn primary" id="check" type="submit">Verificar</button></form>
+         <button class="linkish" id="giveup" type="button">Não sei, mostrar resposta</button>`;
+    $('wform').onsubmit = e => {
+      e.preventDefault();
+      if (cur.revealed) { grade(cur.verdict); return; }
+      const value = $('answer').value;
+      if (!value.trim()) return;
+      cur.typed = value; cur.verdict = (listening ? checkListen : checkAnswer)(cur.view, value); cur.revealed = true;
+      if (cur.verdict && canSpeak() && nlVoice() && !listening) speak(cur.view.say);
+      renderCard();
+      $('next').focus();
+    };
+    if ($('override')) $('override').onclick = () => { cur.verdict = true; renderCard(); $('next').focus(); };
+    if ($('giveup')) $('giveup').onclick = () => { cur.verdict = false; cur.revealed = true; renderCard(); $('next').focus(); };
+  } else if (!cur.revealed) {
+    act.innerHTML = `<button class="btn primary" id="reveal" type="button">Mostrar resposta<kbd>Espaço</kbd></button>`;
+    $('reveal').onclick = reveal;
+  } else {
+    act.innerHTML = `<button class="btn bad" id="no" type="button">Não sabia<kbd>1</kbd></button><button class="btn good" id="yes" type="button">Sabia<kbd>2</kbd></button>`;
+    $('no').onclick = () => grade(false);
+    $('yes').onclick = () => grade(true);
+  }
+}
+function renderBuildActions(cur, act) {
+  if (cur.revealed) {
+    act.innerHTML = `<button class="btn primary" id="next" type="button">Seguinte</button>`;
+    $('next').onclick = () => grade(cur.verdict);
+    $('next').focus({ preventScroll: true });
+    return;
+  }
+  const complete = cur.built.length === cur.view.tokens.length;
+  act.innerHTML = `<div class="bank">${cur.view.tokens.map((t, i) => `<button class="chip" type="button" data-add="${i}"${cur.built.includes(i) ? ' disabled' : ''}>${esc(t)}</button>`).join('')}</div>
+    <button class="btn primary" id="check-build" type="button"${complete ? '' : ' disabled'}>Verificar</button>`;
+  act.querySelectorAll('[data-add]').forEach(b => { b.onclick = () => { cur.built.push(Number(b.dataset.add)); renderCard(); }; });
+  document.querySelectorAll('[data-remove]').forEach(b => { b.onclick = () => { cur.built = cur.built.filter(i => i !== Number(b.dataset.remove)); renderCard(); }; });
+  $('check-build').onclick = () => {
+    cur.typed = cur.built.map(i => cur.view.tokens[i]).join(' ');
+    cur.verdict = checkAnswer(cur.view, cur.typed);
+    cur.revealed = true;
+    renderCard();
+  };
+}
+function reveal() { if (sess.cur && !sess.cur.revealed) { sess.cur.revealed = true; renderCard(); } }
+function focusInput() { const i = $('answer'); if (i) i.focus({ preventScroll: true }); }
+
+function renderEnd(el, act) {
+  const pool = activeCards();
+  if (!pool.length) {
+    el.innerHTML = `<div class="end"><h2>Escolhe um baralho</h2><p>Liga pelo menos um baralho na lista para começar.</p></div>`;
+    act.innerHTML = '';
+    return;
+  }
+  const unseen = pool.filter(c => !rec(c.id)).length;
+  const upcoming = pool.filter(c => rec(c.id) && rec(c.id).due === today() + 1).length;
+  const fpy = sess.total ? Math.round(100 * sess.ok / sess.total) : null;
+  el.innerHTML = `<div class="end">
+    <h2>${sess.total ? 'Sessão concluída' : 'Tudo em dia'}</h2>
+    ${sess.total ? `<p>Acertos à primeira: <strong>${fpy}%</strong> em ${sess.total} cartões.</p>` : ''}
+    <p>${upcoming ? `Amanhã tens ${upcoming} cartões para rever.` : 'Não há cartões marcados para amanhã.'}${unseen ? ` Ainda há ${unseen} cartões novos nestes baralhos.` : ''}</p>
+  </div>`;
+  act.innerHTML = `${unseen ? `<button class="btn primary" id="more" type="button">Mais ${Math.min(NEW_BATCH, unseen)} novos</button>` : ''}<button class="btn" id="cram" type="button">Rever tudo sem mexer nas caixas</button>`;
+  if ($('more')) $('more').onclick = () => { startSession({ extraNew: true }); renderAll(); };
+  $('cram').onclick = () => { startSession({ cram: true }); renderAll(); };
+}
+
+function renderProgress() {
+  const done = sess.size - new Set(sess.queue).size;
+  $('prog-text').textContent = sess.size ? `${done}/${sess.size}` : '0/0';
+  $('prog-bar').style.width = sess.size ? `${Math.round(100 * done / sess.size)}%` : '0';
+  $('prog-fpy').textContent = sess.total ? `${Math.round(100 * sess.ok / sess.total)}% à primeira` : '';
+  $('welcome').hidden = Object.keys(st.cards).length > 0 || sess.answered > 0;
+}
+function streak() {
+  let n = 0, d = today();
+  if (!(st.daily[d] && st.daily[d].n)) d--;
+  while (st.daily[d] && st.daily[d].n) { n++; d--; }
+  return n;
+}
+function renderSide() {
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === st.mode)));
+  document.querySelectorAll('[data-front]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.front === st.front)));
+  $('front-seg').hidden = st.mode !== 'flip';
+  $('mode-listen').hidden = !canSpeak();
+
+  const pool = activeCards();
+  const counts = [0, 0, 0, 0, 0, 0];
+  pool.forEach(c => { counts[rec(c.id) ? rec(c.id).box : 0]++; });
+  const max = Math.max(1, ...counts);
+  $('boxes').innerHTML = counts.map((n, i) => `<div class="boxc${i ? '' : ' new'}"><b>${n}</b><i style="height:${Math.round(52 * n / max)}px"></i><span>${i || 'novo'}</span></div>`).join('');
+
+  const day = st.daily[today()];
+  const fpyToday = day && day.n ? `${Math.round(100 * day.ok / day.n)}%` : '--';
+  $('kpis').innerHTML = `<div><b>${pool.filter(isDue).length}</b><span>para rever hoje</span></div><div><b>${fpyToday}</b><span>acertos à primeira hoje</span></div><div><b>${streak()}</b><span>dias seguidos</span></div>`;
+
+  const hard = hardCards();
+  $('hard-wrap').innerHTML = hard.length ? `<button class="btn" id="hard" type="button">Treinar os que mais falho (${hard.length})</button>` : '';
+  if (hard.length) $('hard').onclick = () => { startSession({ only: hard.map(c => c.id) }); renderAll(); window.scrollTo({ top: 0, behavior: 'auto' }); };
+
+  const groups = ['Conjugar', 'Números e tempo', 'Básicos', 'Vocabulário'];
+  $('decks').innerHTML = groups.map(g => `<div class="dgroup"><small>${g}</small>${DECKS.filter(d => d.group === g).map(d => {
+    const on = st.decks.includes(d.id);
+    const cards = CARDS.filter(c => c.deck === d);
+    const seen = cards.filter(c => rec(c.id)).length;
+    return `<div class="deckrow"><button class="deck" id="deck-${d.id}" data-deck="${d.id}" aria-pressed="${on}" type="button"><span class="hole${on ? ' on' : ''}"></span><span class="n">${esc(d.name)}</span><span class="c">${seen}/${cards.length}</span></button><button class="only" id="only-${d.id}" data-only="${d.id}" type="button" aria-label="Treinar só ${esc(d.name)}">só</button></div>`;
+  }).join('')}</div>`).join('');
+  document.querySelectorAll('[data-only]').forEach(b => { b.onclick = () => {
+    st.decks = [b.dataset.only];
+    save(); startSession(); renderAll();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }; });
+  document.querySelectorAll('[data-deck]').forEach(b => { b.onclick = () => {
+    const id = b.dataset.deck;
+    st.decks = st.decks.includes(id) ? st.decks.filter(x => x !== id) : DECKS.map(d => d.id).filter(x => x === id || st.decks.includes(x));
+    save(); startSession(); renderAll();
+  }; });
+}
+/* Backup: only in the standalone app, where progress lives on the device and nowhere else */
+function backupHtml() {
+  if (!window.PONS_STANDALONE) return '';
+  return `<button class="linkish" id="export" type="button">Guardar cópia do progresso</button>
+    <label class="linkish" for="import-file">Repor uma cópia</label>
+    <input id="import-file" class="file-input" type="file" accept="application/json,.json">`;
+}
+async function exportProgress() {
+  const name = `ponskaarten-progresso-${new Date().toISOString().slice(0, 10)}.json`;
+  const blob = new Blob([JSON.stringify(st)], { type: 'application/json' });
+  try {
+    const file = new File([blob], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'Ponskaarten' });
+      setSync('Cópia criada. Guarda-a em Ficheiros ou no iCloud.');
+      return;
+    }
+  } catch (e) {
+    if (e && e.name === 'AbortError') return; // the user closed the share sheet
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  setSync('Cópia transferida.');
+}
+async function importProgress(e) {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  try {
+    const raw = JSON.parse(await f.text());
+    if (!raw || typeof raw.cards !== 'object' || !Array.isArray(raw.decks)) throw new Error('not a backup');
+    st = normalise(raw);
+    save(); startSession(); renderAll();
+    setSync(`Cópia reposta: ${Object.keys(st.cards).length} cartões com progresso.`);
+  } catch (err) {
+    setSync('Esse ficheiro não é uma cópia da Ponskaarten. Escolhe o ficheiro .json que guardaste.');
+  }
+}
+
+let resetArmed = false;
+function renderReset() {
+  const r = $('reset-row');
+  r.innerHTML = resetArmed
+    ? `<span>Apagar todo o progresso?</span><button class="linkish" id="reset-yes" type="button">Sim, apagar</button><button class="linkish" id="reset-no" type="button">Cancelar</button>`
+    : `<button class="linkish" id="reset" type="button">Recomeçar do zero</button>${backupHtml()}`;
+  if ($('reset')) $('reset').onclick = () => { resetArmed = true; renderReset(); };
+  if ($('export')) $('export').onclick = exportProgress;
+  if ($('import-file')) $('import-file').onchange = importProgress;
+  if ($('reset-no')) $('reset-no').onclick = () => { resetArmed = false; renderReset(); };
+  if ($('reset-yes')) $('reset-yes').onclick = () => {
+    st.cards = {}; st.daily = {}; resetArmed = false; save(); startSession(); renderAll();
+  };
+}
+function renderAll() { renderCard(); renderProgress(); renderSide(); renderReset(); renderRoute(); }
+
+function showTab(name) {
+  document.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', String(x.dataset.tab === name)));
+  ['train', 'study', 'route', 'dialogs', 'verbs', 'rules'].forEach(t => { $('view-' + t).hidden = t !== name; });
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+/* ---------- Study lessons: one per route stage, built from the same deck data ---------- */
+const nl = s => `<span class="nl">${s}</span>`;
+const LESSONS = [
+  { points: [
+    `Os pronomes têm forma forte e fraca: ${nl('jij/je')}, ${nl('wij/we')}, ${nl('zij/ze')}. Na conversa normal usa a fraca; a forte serve para dar ênfase.`,
+    `${nl('u')} é o tratamento formal e conjuga-se como ${nl('jij')}.`,
+    `${nl('zijn')} e ${nl('hebben')} são irregulares e aparecem em quase todas as frases. Decora as quatro formas: ${nl('ben, bent, is, zijn')} e ${nl('heb, hebt, heeft, hebben')}.`,
+    `Os verbos de uma sílaba perdem só o ${nl('-n')}: ${nl('gaan')} dá ${nl('ik ga, jij gaat')}.`,
+    `${nl('weten')} tem o radical ${nl('weet')}, que já termina em t, por isso fica igual: ${nl('ik weet, hij weet')}.`
+  ], tip: 'Lê cada tabela em voz alta, linha a linha. Depois tapa o holandês e tenta dizer cada forma antes de a destapares.' },
+  { points: [
+    `De 0 a 12 são palavras próprias. De 13 a 19 junta-se ${nl('tien')}, com duas mudanças: ${nl('dertien')} e ${nl('veertien')}.`,
+    `As dezenas terminam em ${nl('-tig')}. A que foge ao padrão é ${nl('tachtig')} (80).`,
+    `De 21 a 99 diz-se a unidade primeiro: ${nl('drieëntwintig')} é "três e vinte". O trema separa as vogais.`,
+    `Dias e meses escrevem-se com minúscula: ${nl('maandag, januari')}. Nas datas o dia vem primeiro, como em português: ${nl('negen november')}.`,
+    `Quase todas as palavras interrogativas começam por w: ${nl('wie, wat, waar, wanneer, waarom')}. A exceção é ${nl('hoe')}.`
+  ], tip: 'Conta em voz alta de 20 a 40 e de 80 a 100 todos os dias desta semana. Os números ao contrário só entram com repetição.' },
+  { points: [
+    `A fórmula do presente: ${nl('ik')} = radical, ${nl('jij, u, hij')} = radical + t, plural = infinitivo.`,
+    `O radical é o infinitivo sem ${nl('-en')}, com a escrita ajustada para manter o som.`,
+    `Vogal longa precisa de duas letras quando a sílaba fecha: ${nl('maken')} dá ${nl('maak')}.`,
+    `Consoante dupla simplifica no fim da palavra: ${nl('liggen')} dá ${nl('lig')}.`,
+    `Palavras de ligação: ${nl('en')} (e), ${nl('maar')} (mas), ${nl('of')} (ou), ${nl('want')} (porque).`
+  ], tip: 'Para cada verbo, escreve à mão as três formas (ik, hij, wij). Escrever obriga-te a decidir cada letra.' },
+  { points: [
+    `Com um modal, o segundo verbo vai para o fim no infinitivo: ${nl('Ik kan morgen komen.')}`,
+    `${nl('hij kan, hij wil, hij zal, hij mag')} não levam t.`,
+    `Quando ${nl('jij')} ou ${nl('je')} vem depois do verbo, o t cai: ${nl('Jij werkt')} mas ${nl('Werk jij?')} Só acontece com estes dois pronomes.`,
+    `${nl('geen')} nega um substantivo com ${nl('een')} ou sem artigo: ${nl('Ik heb geen auto.')}`,
+    `${nl('niet')} nega o resto: verbos, adjetivos e substantivos com ${nl('de')} ou ${nl('het')}.`
+  ], tip: 'Pega em 5 frases afirmativas, transforma-as em perguntas e depois em negativas. Diz as três versões em voz alta.' },
+  { points: [
+    `${nl('v')} e ${nl('z')} nunca ficam no fim da sílaba: ${nl('geven')} dá ${nl('geef')}, ${nl('lezen')} dá ${nl('lees')}.`,
+    `Radical em t não leva outro t: ${nl('hij zit')}. Radical em d leva t: ${nl('hij wordt')}.`,
+    `O verbo conjugado fica sempre na 2.ª posição. Se a frase começa por outra palavra, o sujeito passa para depois do verbo: ${nl('Morgen werk ik.')}`,
+    `${nl('onze')} usa-se com palavras ${nl('de')}, ${nl('ons')} com palavras ${nl('het')}: ${nl('onze auto, ons huis')}.`
+  ], tip: 'Pega numa frase simples e começa-a de três maneiras diferentes (Ik..., Morgen..., Vandaag...). Vê o verbo ficar sempre no mesmo sítio.' },
+  { points: [
+    `${nl('half drie')} são 2:30, não 3:30. A meia hora conta-se em direção à hora seguinte.`,
+    `Depois dos 15 minutos a referência passa a ser a meia hora: ${nl('vijf voor half drie')} são 2:25.`,
+    `Nos preços, ${nl('euro')} fica no singular e os cêntimos dizem-se a seguir: ${nl('drie euro vijftig')}.`,
+    `${nl("'s ochtends")} é "de manhã" em geral; ${nl('vanochtend')} é "esta manhã".`
+  ], tip: 'Durante um dia, sempre que vires um relógio, diz a hora em holandês. Faz o mesmo com os preços no supermercado.' },
+  { points: [
+    `Decora cada substantivo com o artigo. Diminutivos em ${nl('-je')} são sempre ${nl('het')} e todos os plurais usam ${nl('de')}.`,
+    `Adjetivo antes do substantivo leva ${nl('-e')}: ${nl('de grote auto, een grote auto, het grote huis')}.`,
+    `Exceção: palavra ${nl('het')} com ${nl('een')} ou sem artigo não leva ${nl('-e')}: ${nl('een groot huis')}.`,
+    `Depois do verbo, o adjetivo não muda: ${nl('De auto is groot.')}`,
+    `Plural: quase sempre ${nl('-en')}; ${nl('-s')} depois de ${nl('-el, -er, -en, -je')}; ${nl("'s")} depois de vogal.`
+  ], tip: 'Faz duas listas no papel, uma para palavras de e outra para palavras het, e acrescenta cada palavra nova à lista certa.' },
+  { points: [
+    `${nl('pinnen')} é pagar com cartão de débito, a forma mais comum de pagar nos Países Baixos.`,
+    `Para virar diz-se ${nl('linksaf')} e ${nl('rechtsaf')}; ${nl('links')} e ${nl('rechts')} indicam o lado.`,
+    `${nl('man')} e ${nl('vrouw')} também significam marido e esposa.`,
+    `${nl('vriend')} pode ser amigo ou namorado; o contexto decide.`
+  ], tip: 'Usa estas frases mesmo que te respondam em inglês. Pede: "Mag het in het Nederlands?"' },
+  { points: [
+    `Adjetivo antes do substantivo leva ${nl('-e')}: ${nl('de grote auto, een grote auto')}. Só não leva com palavra ${nl('het')} no singular com ${nl('een')} ou sem artigo: ${nl('een groot huis')}.`,
+    `Ao juntar o ${nl('-e')}, a escrita ajusta-se como nos verbos: ${nl('groot, grote')}; ${nl('wit, witte')}; ${nl('lief, lieve')}.`,
+    `Comparativo: adjetivo + ${nl('er')} + ${nl('dan')}: ${nl('groter dan')}. Depois de r junta-se ${nl('-der')}: ${nl('duurder')}.`,
+    `Superlativo: ${nl('de grootste')} ou ${nl('het grootst')}. Irregulares: ${nl('goed, beter, best')}; ${nl('veel, meer, meest')}; ${nl('graag, liever, liefst')}.`,
+    `${nl('deze')} (este) e ${nl('die')} (aquele) servem para palavras ${nl('de')} e plurais; ${nl('dit')} e ${nl('dat')} para palavras ${nl('het')} no singular.`,
+    `O tempo descreve-se com ${nl('het')}: ${nl('het regent, het waait, het is koud')}.`
+  ], tip: 'Descreve em voz alta 5 objetos à tua volta com artigo e adjetivo, por exemplo "de grote tafel" e "een klein raam".' },
+  { points: [
+    `Muitos verbos têm um prefixo que se separa no presente: ${nl('opstaan')} dá ${nl('Ik sta om zeven uur op.')}`,
+    `O verbo conjuga-se normalmente na 2.ª posição e o prefixo vai para o fim da frase.`,
+    `Se o verbo já está no fim (com modal ou depois de ${nl('omdat')}), fica junto: ${nl('Ik wil vroeg opstaan.')}`,
+    `Prefixos que se separam: ${nl('op, aan, af, mee, uit, in, terug, weg, open, schoon')}. A tónica cai no prefixo: OPstaan.`,
+    `No passado, ${nl('ge')} fica entre o prefixo e o verbo: ${nl('opgestaan, schoongemaakt')}.`
+  ], tip: 'Descreve a tua manhã em 5 frases: Ik sta op, ik maak ontbijt, ik neem mijn tas mee...' },
+  { points: [
+    `Verbo + ${nl('graag')} = gostar de fazer: ${nl('Ik werk graag.')} Para gostar de uma coisa ou pessoa usa-se ${nl('houden van')}.`,
+    `Para dar opinião usa-se ${nl('vinden')}: ${nl('Ik vind het leuk.')}`,
+    `${nl('zin hebben in')} + coisa e ${nl('zin hebben om te')} + verbo = ter vontade de.`,
+    `O imperativo é só o radical: ${nl('Kom! Wacht even!')} Para ser educado: ${nl('Zou je ... kunnen?')}, ${nl('Wilt u ...?')}, ${nl('Mag ik ...?')}`,
+    `"Há" diz-se ${nl('er is')} no singular e ${nl('er zijn')} no plural.`
+  ], tip: 'Diz 3 coisas de que gostas, 3 de que não gostas e 3 pedidos educados que farias no trabalho.' },
+  { points: [
+    `${nl('en, maar, of, want')} ligam duas frases normais e não mudam a ordem.`,
+    `${nl('omdat, dat, als, of')} (se) e ${nl('terwijl')} mandam o verbo conjugado para o fim: ${nl('omdat ik hier woon')}.`,
+    `Com dois verbos na oração subordinada, os dois vão para o fim: ${nl('omdat ik moet werken')}.`,
+    `Se a frase começa pela oração subordinada, o verbo principal vem logo a seguir: ${nl('Als het regent, blijf ik thuis.')}`,
+    `${nl('want')} e ${nl('omdat')} significam ambos "porque". Na conversa ouves muito ${nl('want')}, que é mais fácil.`
+  ], tip: 'Pega em 3 pares de frases curtas e junta cada par com omdat e depois com want. Compara onde fica o verbo.' },
+  { points: [
+    `Na conversa o passado faz-se com ${nl('hebben')} ou ${nl('zijn')} + particípio no fim: ${nl('Ik heb gisteren gewerkt.')}`,
+    `Particípio regular: ${nl('ge')} + radical + t ou d. Leva t se o radical terminar numa consoante de ${nl("'t kofschip")} (t, k, f, s, ch, p).`,
+    `${nl('zijn')} usa-se com ${nl('zijn, blijven, worden')}, mudanças de estado e movimento com destino.`,
+    `Verbos com ${nl('be-, ge-, her-, ont-, ver-')} não levam ${nl('ge-')}: ${nl('betalen, betaald')}.`,
+    `Muitos verbos comuns são irregulares. Decora-os em pares: ${nl('eten, gegeten')}.`
+  ], tip: 'Ao fim do dia, conta em 3 frases o que fizeste hoje, no passado.' }
+];
+
+const sayCell = (text, tag = 'span', cls = '') => `<${tag} class="nl-c${cls ? ' ' + cls : ''}" data-say="${esc(text)}">${esc(text)}</${tag}>`;
+const tableHtml = (head, rows) => `<div class="scroll"><table><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+function numberWord(n) {
+  if (n <= 20) return first(DECKS.find(d => d.id === 'num').items.find(i => i[0] === String(n))[1].replace('een|één', 'één'));
+  if (n === 100) return 'honderd';
+  return twoDigitWord(n);
+}
+function deckStudyHtml(d) {
+  let body = '';
+  if (d.id === 'num') {
+    const cells = [];
+    for (let n = 0; n <= 100; n++) cells.push(`<div><b>${n}</b>${sayCell(numberWord(n))}</div>`);
+    cells.push(`<div><b>1000</b>${sayCell('duizend')}</div>`);
+    body = `<p>Todos os números de 0 a 100. Quando contas, 1 escreve-se ${nl('één')}, com acento, para não se confundir com ${nl('een')} (um, uma).</p><div class="numgrid">${cells.join('')}</div>`;
+  } else if (d.id === 'tens') {
+    body = `<p>A tabela completa de 0 a 100 está na lição 2. Um exemplo por cada dezena:</p><div class="numgrid">${[21, 34, 47, 52, 65, 76, 83, 99].map(n => `<div><b>${n}</b>${sayCell(twoDigitWord(n))}</div>`).join('')}</div>`;
+  } else if (d.id === 'price') {
+    body = tableHtml(['Preço', 'Em holandês'], [[3, 50], [1, 95], [12, 0], [7, 25], [4, 99]].map(([e, c]) =>
+      `<tr><td class="m">€ ${e},${String(c).padStart(2, '0')}</td><td>${sayCell(c ? `${HOURS[e]} euro ${twoDigitWord(c)}` : `${HOURS[e]} euro`)}</td></tr>`));
+  } else if (d.id === 'clock') {
+    body = tableHtml(['Hora', 'Em holandês', 'Lógica'], CLOCK_PATTERNS.map(([mm, build, note]) =>
+      `<tr><td class="m">2:${mm}</td><td>${build('twee', 'drie').map(s => sayCell(s)).join(' / ')}</td><td>${esc(note)}</td></tr>`));
+  } else if (d.type === 'conj') {
+    body = (d.note ? `<p>${esc(d.note)}</p>` : '') + tableHtml(['Verbo', 'Significado', 'ik', 'jij', 'u', 'hij / zij', 'wij / jullie / zij'], d.verbs.map(v =>
+      `<tr><td>${sayCell(v.inf)}</td><td>${esc(v.pt)}${v.note ? `<br><small>${esc(v.note)}</small>` : ''}</td>${[v.ik, v.jij, v.u || v.jij, v.hij, v.inf].map(f => `<td>${sayCell(pretty(f))}</td>`).join('')}</tr>`));
+  } else if (d.type === 'vocab') {
+    body = tableHtml(['Português', 'Holandês', 'Nota'], d.items.map(([pt, nlw, note]) =>
+      `<tr><td>${esc(pt)}</td><td>${sayCell(pretty(nlw))}</td><td>${esc(note || '')}</td></tr>`));
+  } else if (d.type === 'cloze') {
+    body = tableHtml(['Frase', 'Tradução', 'Porquê'], d.items.map(([s, , pt, a, note]) => {
+      const [before, after] = esc(s).split('___');
+      return `<tr><td class="m">${before}${sayCell(a)}${after}</td><td>${esc(pt)}</td><td>${esc(note)}</td></tr>`;
+    }));
+  } else if (d.type === 'build') {
+    body = tableHtml(['Português', 'Holandês', 'Regra'], d.items.map(([pt, nlw, , note]) =>
+      `<tr><td>${esc(pt)}</td><td>${sayCell(first(nlw))}</td><td>${esc(note)}</td></tr>`));
+  } else if (d.type === 'art') {
+    body = tableHtml(['Palavra', 'Com artigo', 'Significado'], d.items.map(([w, pt, art]) =>
+      `<tr><td class="m">${esc(w)}</td><td>${sayCell(`${art} ${w}`)}</td><td>${esc(pt)}</td></tr>`));
+  }
+  return `<section class="dsec"><h3>${esc(d.name)}</h3>${body}</section>`;
+}
+let studyCovered = false;
+function renderStudy() {
+  const i = Math.min(ROUTE.length - 1, Math.max(0, st.lesson || 0)), stage = ROUTE[i], lesson = LESSONS[i];
+  $('lesson-nav').innerHTML = ROUTE.map((s, k) => `<button class="lchip" type="button" id="lesson-${k}" data-lesson="${k}" aria-pressed="${k === i}"><b>${k + 1}</b>${esc(s.name)}</button>`).join('');
+  $('lesson').classList.toggle('covered', studyCovered);
+  $('lesson').innerHTML = `
+    <header class="lhead"><small>Lição ${i + 1} de ${ROUTE.length}</small><h2>${esc(stage.name)}</h2><p>${esc(stage.goal)}</p></header>
+    <section class="dsec"><h3>O essencial</h3><ul>${lesson.points.map(p => `<li>${p}</li>`).join('')}</ul></section>
+    ${stage.decks.map(id => deckStudyHtml(DECKS.find(d => d.id === id))).join('')}
+    <p class="callout"><b>Como estudar esta lição:</b> ${esc(lesson.tip)}</p>
+    <div class="lfoot">
+      ${i > 0 ? '<button class="btn" id="lesson-prev" type="button">Lição anterior</button>' : ''}
+      <button class="btn primary" id="lesson-train" type="button">Praticar esta lição</button>
+      <button class="btn" id="lesson-test" type="button">Teste rápido (10 perguntas)</button>
+      ${i < ROUTE.length - 1 ? '<button class="btn" id="lesson-next" type="button">Lição seguinte</button>' : ''}
+    </div>`;
+  const go = k => { st.lesson = k; save(); renderStudy(); window.scrollTo({ top: 0, behavior: 'auto' }); };
+  document.querySelectorAll('[data-lesson]').forEach(b => { b.onclick = () => go(Number(b.dataset.lesson)); });
+  if ($('lesson-prev')) $('lesson-prev').onclick = () => go(i - 1);
+  if ($('lesson-next')) $('lesson-next').onclick = () => go(i + 1);
+  $('lesson-train').onclick = () => { st.decks = stage.decks.slice(); save(); startSession(); renderAll(); showTab('train'); };
+  // A test does not move cards between boxes, so it can be repeated freely.
+  $('lesson-test').onclick = () => {
+    const ids = shuffle(CARDS.filter(c => stage.decks.includes(c.deck.id)).map(c => c.id)).slice(0, 10);
+    if (st.mode === 'flip') { st.mode = 'write'; save(); }
+    startSession({ only: ids }); renderAll(); showTab('train');
+  };
+}
+
+function renderRoute() {
+  $('route').innerHTML = ROUTE.map((stage, i) => {
+    const cards = CARDS.filter(c => stage.decks.includes(c.deck.id));
+    const solid = cards.filter(c => rec(c.id) && rec(c.id).box >= 3).length;
+    const names = stage.decks.map(id => DECKS.find(d => d.id === id).name).join(' · ');
+    const active = stage.decks.length === st.decks.length && stage.decks.every(id => st.decks.includes(id));
+    return `<div class="stage"><span class="num">${i + 1}</span>
+      <div class="info"><h3>${esc(stage.name)}</h3><p>${esc(stage.goal)}</p><small>${esc(names)}</small>
+        <div class="bar"><i style="width:${Math.round(100 * solid / cards.length)}%"></i></div>
+        <small>${solid} de ${cards.length} cartões já consolidados (caixa 3 ou mais)</small></div>
+      <button class="btn${active ? '' : ' primary'}" id="stage-${i}" data-stage="${i}" type="button">${active ? 'Etapa ligada' : 'Treinar'}</button></div>`;
+  }).join('');
+  document.querySelectorAll('[data-stage]').forEach(b => { b.onclick = () => {
+    st.decks = ROUTE[Number(b.dataset.stage)].decks.slice();
+    save(); startSession(); renderAll(); showTab('train');
+  }; });
+}
+function renderDialogs() {
+  $('dialogs').innerHTML = DIALOGS.map((d, n) => `<section><h2>${esc(d.title)}</h2><div class="dialog">${d.lines.map(([who, nl, pt], i) => `
+    <div class="line"><span class="who">${who}</span><div class="said"><p class="nl-line">${esc(nl)}</p><p class="pt-line">${esc(pt)}</p></div>${canSpeak() ? `<button class="speak" type="button" data-say="${n}:${i}" aria-label="Ouvir esta frase">Ouvir</button>` : ''}</div>`).join('')}</div></section>`).join('');
+  document.querySelectorAll('[data-say]').forEach(b => { b.onclick = () => {
+    const [n, i] = b.dataset.say.split(':').map(Number);
+    speak(DIALOGS[n].lines[i][1]);
+  }; });
+}
+
+function renderVerbs() {
+  const q = normaliseAnswer($('verb-filter').value);
+  const seen = new Set();
+  const rows = DECKS.filter(d => d.type === 'conj').flatMap(d => d.verbs).filter(v => {
+    if (seen.has(v.inf)) return false;
+    seen.add(v.inf);
+    return !q || normaliseAnswer(`${v.inf} ${v.pt}`).includes(q);
+  });
+  $('verb-rows').innerHTML = rows.length ? rows.map(v => `<tr><td class="m">${v.inf}</td><td>${esc(v.pt)}</td><td class="m">${pretty(v.ik)}</td><td class="m">${pretty(v.jij)}</td><td class="m">${pretty(v.u || v.jij)}</td><td class="m">${v.hij}</td><td class="m">${v.inf}</td></tr>`).join('')
+    : `<tr><td colspan="7">Nenhum verbo encontrado. Experimenta outra palavra.</td></tr>`;
+}
+
+/* ---------- Events ---------- */
+document.querySelectorAll('[data-mode]').forEach(b => { b.onclick = () => {
+  st.mode = b.dataset.mode; save();
+  if (sess.cur) { sess.cur.revealed = false; sess.cur.typed = ''; sess.cur.verdict = null; sess.cur.built = []; }
+  renderAll();
+  if (st.mode === 'write') focusInput();
+}; });
+document.querySelectorAll('[data-front]').forEach(b => { b.onclick = () => { st.front = b.dataset.front; save(); renderAll(); }; });
+document.querySelectorAll('[data-tab]').forEach(b => { b.onclick = () => showTab(b.dataset.tab); });
+$('welcome-route').onclick = () => showTab('route');
+document.querySelectorAll('[data-pt]').forEach(b => { b.onclick = () => {
+  const show = b.dataset.pt === 'show';
+  $('view-dialogs').classList.toggle('hide-pt', !show);
+  document.querySelectorAll('[data-pt]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+}; });
+$('verb-filter').oninput = renderVerbs;
+document.addEventListener('keydown', e => {
+  if ($('view-train').hidden || !sess.cur || sess.cur.view.kind === 'build' || e.ctrlKey || e.metaKey || e.altKey) return;
+  const tag = e.target.tagName;
+  if (tag === 'INPUT') return;
+  if (e.key === ' ' && tag !== 'BUTTON' && st.mode === 'flip') { e.preventDefault(); reveal(); }
+  if (st.mode === 'flip' && sess.cur.revealed) {
+    if (e.key === '1') grade(false);
+    if (e.key === '2') grade(true);
+  }
+});
+
+startSession();
+renderAll();
+renderVerbs();
+renderDialogs();
+renderStudy();
+$('lesson').addEventListener('click', e => {
+  const cell = e.target.closest('.nl-c');
+  if (!cell) return;
+  if (studyCovered && !cell.classList.contains('show')) { cell.classList.add('show'); return; }
+  speak(cell.dataset.say);
+});
+document.querySelectorAll('[data-cover]').forEach(b => { b.onclick = () => {
+  studyCovered = b.dataset.cover === 'on';
+  document.querySelectorAll('[data-cover]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  renderStudy();
+}; });
+if (canSpeak()) speechSynthesis.getVoices();
+initSync();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(err => console.warn('Offline mode unavailable', err)));
+}
+</script>
+</body>
+</html>
